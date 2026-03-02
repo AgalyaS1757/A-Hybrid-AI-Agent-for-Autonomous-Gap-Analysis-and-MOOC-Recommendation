@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPTIMIZE — Hybrid Intelligent MOOC System</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@600;700&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & ROOT ─────────────────────────────────────────── */
+:root {
+  --bg: #05080f;
+  --s1: #090d18;
+  --s2: #0e1525;
+  --s3: #141d30;
+  --border: #1c2940;
+  --border2: #243352;
+  --accent: #22d3ee;
+  --accent2: #f97316;
+  --accent3: #a78bfa;
+  --gold: #fbbf24;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #e2e8f5;
+  --muted: #64748b;
+  --muted2: #94a3b8;
+  --card: #0b1120;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── BACKGROUND GRID ──────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(34,211,238,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* ── HEADER ───────────────────────────────────────────────── */
+.site-header {
+  position: relative; z-index: 10;
+  background: rgba(5,8,15,.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo {
+  font-family: 'Clash Display', sans-serif;
+  font-size: 1.1rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.logo span { -webkit-text-fill-color: var(--muted2); font-size: .7rem; font-family: 'Cabinet Grotesk', sans-serif; font-weight: 400; margin-left: .4rem; }
+.header-btns { display: flex; gap: .6rem; }
+.hbtn {
+  padding: .4rem .9rem; border-radius: 6px; font-size: .75rem; font-weight: 600;
+  cursor: pointer; font-family: 'Cabinet Grotesk', sans-serif; transition: all .2s;
+  border: 1px solid var(--border2); background: transparent; color: var(--muted2);
+}
+.hbtn:hover { border-color: var(--accent); color: var(--accent); }
+.hbtn.primary { background: var(--accent); color: #000; border-color: var(--accent); }
+.hbtn.primary:hover { opacity: .85; }
+
+/* ── PROGRESS BAR ─────────────────────────────────────────── */
+.progress-strip {
+  position: relative; z-index: 10;
+  background: var(--s1);
+  border-bottom: 1px solid var(--border);
+  padding: 1.2rem 2rem;
+}
+.progress-inner { max-width: 900px; margin: 0 auto; }
+.progress-steps {
+  display: flex; align-items: center; gap: 0;
+}
+.ps-item {
+  display: flex; align-items: center; gap: .5rem; flex: 1;
+  position: relative;
+}
+.ps-item:not(:last-child)::after {
+  content: '';
+  flex: 1; height: 2px; background: var(--border2);
+  margin: 0 .3rem; transition: background .4s;
+}
+.ps-item.done:not(:last-child)::after { background: var(--accent); }
+.ps-dot {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700;
+  border: 2px solid var(--border2);
+  background: var(--s2); color: var(--muted);
+  transition: all .3s; cursor: default;
+}
+.ps-item.active .ps-dot { border-color: var(--accent); background: rgba(34,211,238,.12); color: var(--accent); }
+.ps-item.done .ps-dot { border-color: var(--accent); background: var(--accent); color: #000; }
+.ps-label { font-size: .68rem; color: var(--muted); font-weight: 500; white-space: nowrap; display: none; }
+@media(min-width:600px){ .ps-label { display: block; } }
+.ps-item.active .ps-label { color: var(--accent); }
+.ps-item.done .ps-label { color: var(--green); }
+
+/* ── WRAPPER ──────────────────────────────────────────────── */
+.wrapper {
+  position: relative; z-index: 5;
+  max-width: 900px; margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+/* ── STEP PANELS ──────────────────────────────────────────── */
+.step { display: none; animation: fadeIn .4s ease; }
+.step.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+.step-hero {
+  text-align: center; margin-bottom: 2.5rem;
+}
+.step-num-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .68rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid rgba(34,211,238,.3);
+  padding: .3rem .9rem; border-radius: 20px; margin-bottom: 1rem;
+}
+.step-hero h2 {
+  font-family: 'Clash Display', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 700;
+  line-height: 1.15; color: var(--text); margin-bottom: .5rem;
+}
+.step-hero p { font-size: .9rem; color: var(--muted2); max-width: 480px; margin: 0 auto; line-height: 1.55; }
+
+/* ── CARDS ────────────────────────────────────────────────── */
+.glass-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 2rem;
+  margin-bottom: 1.2rem;
+}
+.card-label {
+  font-size: .65rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 1rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.card-label::before { content:''; width:3px; height:14px; background:var(--accent); border-radius:2px; }
+
+/* ── FORM ─────────────────────────────────────────────────── */
+.field { margin-bottom: 1.2rem; }
+.field label { font-size: .78rem; color: var(--muted2); font-weight: 600; display: block; margin-bottom: .45rem; }
+.field input, .field textarea, .field select {
+  width: 100%;
+  padding: .75rem 1rem;
+  background: var(--s3);
+  border: 1.5px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  font-family: 'Cabinet Grotesk', sans-serif; font-size: .9rem;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus, .field textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(34,211,238,.08);
+}
+.field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+.field textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+.field-hint { font-size: .7rem; color: var(--muted); margin-top: .3rem; }
+.field-error { font-size: .72rem; color: var(--red); margin-top: .3rem; display: none; }
+.field-error.show { display: block; }
+
+/* ── CHOICE TILES ─────────────────────────────────────────── */
+.choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-bottom: 1.2rem; }
+@media(max-width:480px){ .choice-grid { grid-template-columns: 1fr; } }
+.choice-tile {
+  padding: 1.2rem 1rem;
+  background: var(--s2); border: 2px solid var(--border);
+  border-radius: 12px; cursor: pointer; transition: all .2s;
+  text-align: center;
+}
+.choice-tile:hover { border-color: var(--border2); background: var(--s3); }
+.choice-tile.selected { border-color: var(--accent); background: rgba(34,211,238,.07); }
+.ct-icon { font-size: 1.8rem; margin-bottom: .4rem; }
+.ct-title { font-weight: 700; font-size: .88rem; color: var(--text); margin-bottom: .2rem; }
+.ct-desc { font-size: .72rem; color: var(--muted); line-height: 1.4; }
+
+/* ── LEVEL TILES ──────────────────────────────────────────── */
+.level-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .7rem; }
+@media(max-width:500px){ .level-grid { grid-template-columns: 1fr; } }
+.level-tile {
+  padding: 1rem; background: var(--s2); border: 2px solid var(--border);
+  border-radius: 12px; cursor: pointer; transition: all .2s; text-align: center;
+}
+.level-tile:hover { border-color: var(--border2); }
+.level-tile.selected { border-color: var(--gold); background: rgba(251,191,36,.06); }
+.lt-icon { font-size: 1.5rem; margin-bottom: .3rem; }
+.lt-title { font-weight: 700; font-size: .82rem; color: var(--text); }
+.lt-sub { font-size: .68rem; color: var(--muted); margin-top: .15rem; }
+
+/* ── SKILL CHIPS ──────────────────────────────────────────── */
+.skill-cloud { display: flex; flex-wrap: wrap; gap: .45rem; }
+.sc-chip {
+  padding: .32rem .75rem; border-radius: 20px; font-size: .72rem; font-weight: 600;
+  border: 1px solid var(--border); background: var(--s2);
+  color: var(--muted); cursor: pointer; transition: all .2s;
+}
+.sc-chip:hover { border-color: var(--border2); color: var(--text); }
+.sc-chip.on { background: rgba(34,211,238,.12); border-color: var(--accent); color: var(--accent); }
+
+/* ── UPLOAD ZONE ──────────────────────────────────────────── */
+.upload-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 14px; padding: 2.5rem 1rem;
+  text-align: center; cursor: pointer; transition: all .25s;
+  background: var(--s2); position: relative;
+}
+.upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(34,211,238,.04); }
+.upload-zone input { display: none; }
+.uz-icon { font-size: 2.5rem; margin-bottom: .6rem; }
+.uz-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: .25rem; }
+.uz-sub { font-size: .72rem; color: var(--muted); }
+.uz-success { font-size: .8rem; color: var(--green); margin-top: .5rem; font-weight: 600; }
+
+/* ── BUTTONS ──────────────────────────────────────────────── */
+.btn-row { display: flex; gap: .8rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.btn {
+  padding: .75rem 1.8rem; border-radius: 10px; font-size: .88rem; font-weight: 700;
+  cursor: pointer; font-family: 'Cabinet Grotesk', sans-serif; transition: all .2s;
+  border: none; display: inline-flex; align-items: center; gap: .4rem;
+}
+.btn-primary { background: linear-gradient(135deg, var(--accent), #06b6d4); color: #000; }
+.btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border2); color: var(--muted2); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-lg { padding: .9rem 2.2rem; font-size: .95rem; width: 100%; justify-content: center; }
+.btn-red { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+
+/* ── ATS REPORT ───────────────────────────────────────────── */
+.ats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; }
+@media(max-width:520px){ .ats-grid { grid-template-columns: 1fr; } }
+
+.score-circle-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.score-circle {
+  width: 120px; height: 120px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; margin-bottom: .5rem;
+}
+.score-circle svg { position: absolute; top:0; left:0; transform: rotate(-90deg); }
+.score-circle svg circle { fill: none; stroke-width: 8; }
+.score-bg { stroke: var(--s3); }
+.score-fg { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset 1.2s ease; }
+.score-num { font-family: 'Clash Display', sans-serif; font-size: 1.8rem; font-weight: 700; line-height: 1; }
+.score-lbl { font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+
+.metric-box {
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem 1.2rem;
+}
+.mb-label { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-weight: 600; margin-bottom: .35rem; }
+.mb-value { font-family: 'Clash Display', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text); }
+.mb-sub { font-size: .7rem; color: var(--muted2); margin-top: .2rem; }
+
+.bar-track { background: var(--s3); border-radius: 6px; height: 8px; overflow: hidden; margin-top: .4rem; }
+.bar-fill { height: 100%; border-radius: 6px; transition: width 1s ease; }
+.bar-accent { background: linear-gradient(90deg, var(--accent), var(--accent3)); }
+.bar-gold { background: linear-gradient(90deg, var(--gold), var(--accent2)); }
+.bar-green { background: linear-gradient(90deg, var(--green), var(--accent)); }
+.bar-red { background: linear-gradient(90deg, #ef4444, #f97316); }
+
+/* ── GAP & TIPS ───────────────────────────────────────────── */
+.alert-box {
+  border-radius: 12px; padding: 1.1rem 1.2rem; margin-bottom: 1rem;
+  display: flex; gap: .8rem; align-items: flex-start;
+}
+.alert-warn { background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.25); }
+.alert-tip { background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.25); }
+.alert-info { background: rgba(34,211,238,.07); border: 1px solid rgba(34,211,238,.2); }
+.alert-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: .05rem; }
+.alert-title { font-size: .78rem; font-weight: 700; margin-bottom: .25rem; }
+.alert-warn .alert-title { color: #fca5a5; }
+.alert-tip .alert-title { color: #6ee7b7; }
+.alert-info .alert-title { color: var(--accent); }
+.alert-body { font-size: .78rem; color: var(--muted2); line-height: 1.55; }
+
+/* ── ROADMAP ──────────────────────────────────────────────── */
+.roadmap-list { display: flex; flex-direction: column; gap: .7rem; }
+.rm-item {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: .9rem 1rem; background: var(--s2); border: 1px solid var(--border);
+  border-radius: 10px; transition: border-color .2s;
+}
+.rm-item:hover { border-color: var(--border2); }
+.rm-num {
+  min-width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 800; color: var(--accent);
+  font-family: 'Clash Display', sans-serif;
+}
+.rm-title { font-size: .85rem; font-weight: 700; color: var(--text); margin-bottom: .2rem; }
+.rm-desc { font-size: .75rem; color: var(--muted2); line-height: 1.4; }
+
+/* ── SKILL TAGS ───────────────────────────────────────────── */
+.tag-row { display: flex; flex-wrap: wrap; gap: .35rem; }
+.tag {
+  font-size: .68rem; padding: .22rem .6rem; border-radius: 8px; font-weight: 600;
+}
+.tag-found { background: rgba(16,185,129,.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,.25); }
+.tag-miss { background: rgba(239,68,68,.12); color: #fca5a5; border: 1px solid rgba(239,68,68,.2); }
+.tag-neutral { background: rgba(34,211,238,.1); color: var(--accent); border: 1px solid rgba(34,211,238,.2); }
+
+/* ── COURSE CARDS ─────────────────────────────────────────── */
+.courses-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem; flex-wrap: wrap; gap: .5rem;
+}
+.courses-title { font-family: 'Clash Display', sans-serif; font-size: 1rem; font-weight: 700; }
+.level-badge {
+  font-size: .68rem; font-weight: 700; padding: .28rem .7rem; border-radius: 12px;
+}
+.lb-beg { background: rgba(16,185,129,.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,.3); }
+.lb-int { background: rgba(251,191,36,.12); color: var(--gold); border: 1px solid rgba(251,191,36,.25); }
+.lb-adv { background: rgba(239,68,68,.12); color: #fca5a5; border: 1px solid rgba(239,68,68,.2); }
+.lb-all { background: rgba(167,139,250,.12); color: var(--accent3); border: 1px solid rgba(167,139,250,.25); }
+
+.course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(265px,1fr)); gap: .9rem; }
+.c-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: transform .22s, border-color .22s, box-shadow .22s;
+  animation: fadeIn .35s ease both;
+}
+.c-card:hover { transform: translateY(-3px); border-color: rgba(34,211,238,.35); box-shadow: 0 10px 32px rgba(34,211,238,.07); }
+.c-top { padding: .9rem .95rem .7rem; border-bottom: 1px solid var(--border); }
+.c-plat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: .5rem; }
+.c-plat { font-size: .58rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; padding: .18rem .52rem; border-radius: 8px; }
+.c-cost { font-size: .58rem; font-weight: 700; padding: .18rem .52rem; border-radius: 8px; }
+.c-free { background: rgba(16,185,129,.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,.25); }
+.c-paid { background: rgba(249,115,22,.15); color: #fdba74; border: 1px solid rgba(249,115,22,.25); }
+.c-freemium { background: rgba(251,191,36,.12); color: var(--gold); border: 1px solid rgba(251,191,36,.2); }
+.c-title { font-family: 'Clash Display', sans-serif; font-size: .86rem; font-weight: 700; line-height: 1.3; color: var(--text); margin-bottom: .2rem; }
+.c-prov { font-size: .68rem; color: var(--muted); }
+.c-body { padding: .75rem .95rem; flex: 1; }
+.c-stars { color: var(--gold); font-size: .76rem; }
+.c-rating-row { display: flex; align-items: center; gap: .3rem; margin-bottom: .45rem; }
+.c-rn { font-size: .68rem; color: var(--muted); }
+.c-desc { font-size: .72rem; color: #8899b5; line-height: 1.48; margin-bottom: .6rem; }
+.c-chips { display: flex; flex-wrap: wrap; gap: .28rem; margin-bottom: .5rem; }
+.c-chip { font-size: .6rem; padding: .14rem .46rem; border-radius: 4px; font-weight: 600; }
+.cc-lvl { background: rgba(167,139,250,.12); color: var(--accent3); }
+.cc-dur { background: rgba(251,191,36,.08); color: #b8962a; }
+.c-price { font-size: .9rem; font-weight: 700; }
+.c-price-sub { font-size: .62rem; color: var(--muted); }
+.c-foot { padding: .62rem .95rem; border-top: 1px solid var(--border); }
+.c-topics { display: flex; flex-wrap: wrap; gap: .25rem; margin-bottom: .55rem; }
+.c-topic { font-size: .57rem; padding: .13rem .4rem; border-radius: 3px; background: var(--s2); color: var(--muted); border: 1px solid var(--border); }
+.c-btn {
+  display: block; width: 100%; padding: .52rem; border-radius: 7px; text-align: center;
+  font-size: .76rem; font-weight: 700; text-decoration: none; transition: all .2s;
+  background: rgba(34,211,238,.08); color: var(--accent); border: 1px solid rgba(34,211,238,.2);
+}
+.c-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+/* platform colors */
+.plat-coursera{background:rgba(26,86,200,.2);color:#6ba4ff}
+.plat-edx{background:rgba(185,28,28,.2);color:#ff8080}
+.plat-udemy{background:rgba(168,85,25,.2);color:#ffa875}
+.plat-youtube{background:rgba(220,38,38,.2);color:#ff8080}
+.plat-nptel{background:rgba(194,65,12,.2);color:#ff9a6c}
+.plat-swayam{background:rgba(21,101,192,.2);color:#6db3ff}
+.plat-khan{background:rgba(109,40,217,.2);color:#b39cff}
+.plat-fcc{background:rgba(5,150,105,.2);color:#5cd8a8}
+.plat-mit{background:rgba(5,120,90,.2);color:#4ecfaf}
+.plat-full{background:rgba(0,120,200,.2);color:#60c0ff}
+.plat-google{background:rgba(66,133,244,.2);color:#7fb8ff}
+.plat-microsoft{background:rgba(0,120,212,.2);color:#64b5f6}
+.plat-aws{background:rgba(255,153,0,.2);color:#ffcc66}
+.plat-ibm{background:rgba(30,80,200,.2);color:#80a8ff}
+.plat-fast{background:rgba(80,60,180,.2);color:#b0a0ff}
+.plat-kaggle{background:rgba(32,160,208,.2);color:#70d0ff}
+.plat-other{background:rgba(100,100,100,.2);color:#aaa}
+
+/* ── FEEDBACK FORM ────────────────────────────────────────── */
+.star-row { display: flex; gap: .5rem; margin: .5rem 0; }
+.star-btn { font-size: 2rem; cursor: pointer; color: var(--border2); transition: color .15s; line-height: 1; border: none; background: none; padding: 0; }
+.star-btn.lit { color: var(--gold); }
+.star-btn:hover, .star-btn:hover ~ .star-btn { color: var(--gold); }
+.radio-pills { display: flex; flex-wrap: wrap; gap: .5rem; }
+.rpill {
+  padding: .38rem .9rem; border-radius: 20px; font-size: .76rem; font-weight: 600;
+  border: 1px solid var(--border2); background: var(--s2); color: var(--muted);
+  cursor: pointer; transition: all .2s;
+}
+.rpill.on { background: rgba(34,211,238,.1); border-color: var(--accent); color: var(--accent); }
+
+/* ── DOMAIN TABS ──────────────────────────────────────────── */
+.domain-scroller {
+  display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .5rem; margin-bottom: 1.2rem;
+  scrollbar-width: none;
+}
+.domain-scroller::-webkit-scrollbar { display: none; }
+.d-tab {
+  padding: .35rem .85rem; border-radius: 20px; font-size: .72rem; font-weight: 600;
+  border: 1px solid var(--border); background: transparent; color: var(--muted);
+  cursor: pointer; transition: all .2s; white-space: nowrap; flex-shrink: 0;
+}
+.d-tab:hover { border-color: var(--border2); color: var(--text); }
+.d-tab.on { background: var(--accent); color: #000; border-color: var(--accent); }
+
+/* ── SEARCH BAR ───────────────────────────────────────────── */
+.search-bar {
+  position: relative; margin-bottom: 1.2rem;
+}
+.search-bar input {
+  width: 100%; padding: .7rem 1rem .7rem 2.5rem;
+  background: var(--s2); border: 1.5px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  font-family: 'Cabinet Grotesk', sans-serif; font-size: .88rem;
+  outline: none; transition: border-color .2s;
+}
+.search-bar input:focus { border-color: var(--accent); }
+.search-bar input::placeholder { color: var(--muted); }
+.search-bar::before { content: '⌕'; position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 1.1rem; pointer-events: none; }
+
+/* ── SUCCESS / DONE ───────────────────────────────────────── */
+.done-wrap { text-align: center; padding: 3rem 1rem; }
+.done-icon { font-size: 4rem; margin-bottom: 1rem; animation: bounce .6s ease; }
+@keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+.done-title { font-family: 'Clash Display', sans-serif; font-size: 1.6rem; font-weight: 700; margin-bottom: .5rem; }
+.done-sub { font-size: .9rem; color: var(--muted2); max-width: 420px; margin: 0 auto 2rem; line-height: 1.55; }
+
+/* ── DIVIDER ──────────────────────────────────────────────── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+/* ── TOOLTIP ──────────────────────────────────────────────── */
+.tip-text { font-size: .72rem; color: var(--muted); font-style: italic; margin-top: .3rem; }
+
+/* ── RESPONSIVE ───────────────────────────────────────────── */
+@media(max-width:520px){
+  .site-header { padding: .8rem 1rem; }
+  .progress-strip { padding: 1rem; }
+  .wrapper { padding: 1.5rem 1rem 4rem; }
+  .glass-card { padding: 1.2rem; }
+  .ats-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="logo">OPTIMIZE<span>Hybrid Intelligent MOOC System</span></div>
+  <div class="header-btns">
+    <button class="hbtn" onclick="goStep(1)">↩ Restart</button>
+    <a href="mailto:kasthuria349@gmail.com?subject=MOOC Query" class="hbtn primary">💬 Contact Us</a>
+  </div>
+</header>
+
+<!-- ── PROGRESS STRIP ─────────────────────────────────────── -->
+<div class="progress-strip">
+  <div class="progress-inner">
+    <div class="progress-steps" id="progressSteps">
+      <div class="ps-item active" data-step="1"><div class="ps-dot">1</div><div class="ps-label">Verify</div></div>
+      <div class="ps-item" data-step="2"><div class="ps-dot">2</div><div class="ps-label">Profile</div></div>
+      <div class="ps-item" data-step="3"><div class="ps-dot">3</div><div class="ps-label">Resume</div></div>
+      <div class="ps-item" data-step="4"><div class="ps-dot">4</div><div class="ps-label">ATS Report</div></div>
+      <div class="ps-item" data-step="5"><div class="ps-dot">5</div><div class="ps-label">Career Tips</div></div>
+      <div class="ps-item" data-step="6"><div class="ps-dot">6</div><div class="ps-label">Courses</div></div>
+      <div class="ps-item" data-step="7"><div class="ps-dot">7</div><div class="ps-label">Feedback</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN WIZARD ────────────────────────────────────────── -->
+<div class="wrapper">
+
+<!-- ════════════════ STEP 1: EMAIL VERIFY ════════════════ -->
+<div class="step active" id="step1">
+  <div class="step-hero">
+    <div class="step-num-badge">⚡ Step 1 of 7</div>
+    <h2>Verify Your Identity</h2>
+    <p>Enter your email to get a personalized learning experience and save your progress.</p>
+  </div>
+  <div class="glass-card">
+    <div class="card-label">Email Verification</div>
+    <div class="field">
+      <label>📧 Your Email Address</label>
+      <input type="email" id="emailInput" placeholder="yourname@example.com" onkeydown="if(event.key==='Enter')verifyEmail()">
+      <div class="field-error" id="emailErr">Please enter a valid email address (e.g. name@domain.com)</div>
+    </div>
+    <div class="alert-box alert-info">
+      <div class="alert-icon">🔒</div>
+      <div>
+        <div class="alert-title">Your data stays private</div>
+        <div class="alert-body">We only use your email to personalize recommendations. No data is stored on any server — everything runs in your browser.</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-lg" onclick="verifyEmail()">Verify & Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ STEP 2: PROFILE SETUP ════════════════ -->
+<div class="step" id="step2">
+  <div class="step-hero">
+    <div class="step-num-badge">🧠 Step 2 of 7</div>
+    <h2>Tell Us About Yourself</h2>
+    <p>Your background helps our AI pick the right courses and build your career roadmap.</p>
+  </div>
+  <div class="glass-card">
+    <div class="card-label">Choose Your Profile Method</div>
+    <div class="choice-grid" id="profileMethodChoice">
+      <div class="choice-tile selected" id="tile-manual" onclick="selectProfileMethod('manual')">
+        <div class="ct-icon">✍️</div>
+        <div class="ct-title">Manual Input</div>
+        <div class="ct-desc">Fill in your skills, projects and goals step by step</div>
+      </div>
+      <div class="choice-tile" id="tile-resume" onclick="selectProfileMethod('resume')">
+        <div class="ct-icon">📄</div>
+        <div class="ct-title">Upload Resume</div>
+        <div class="ct-desc">We'll scan your resume and extract skills automatically</div>
+      </div>
+    </div>
+
+    <div id="manualSection">
+      <div class="field">
+        <label>🎓 Past Courses & Certifications</label>
+        <input type="text" id="pastCourses" placeholder="e.g. Python Bootcamp, AWS Cloud Practitioner, SQL for Beginners…">
+      </div>
+      <div class="field">
+        <label>💡 Key Projects You've Built</label>
+        <textarea id="projects" placeholder="e.g. Built a sales dashboard in Tableau, deployed a sentiment analysis model on AWS, created a React e-commerce app…"></textarea>
+      </div>
+      <div class="field">
+        <label>🎯 Target Domain / Role</label>
+        <input type="text" id="targetDomain" placeholder="e.g. Data Science, Full Stack Developer, AI Engineer, Product Manager…">
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-label">Your Seniority Level</div>
+    <div class="level-grid">
+      <div class="level-tile" id="lvl-junior" onclick="selectLevel('junior')">
+        <div class="lt-icon">🎓</div>
+        <div class="lt-title">Junior / Fresher</div>
+        <div class="lt-sub">0–2 years experience</div>
+      </div>
+      <div class="level-tile selected" id="lvl-mid" onclick="selectLevel('mid')">
+        <div class="lt-icon">💼</div>
+        <div class="lt-title">Mid-Level</div>
+        <div class="lt-sub">2–5 years experience</div>
+      </div>
+      <div class="level-tile" id="lvl-senior" onclick="selectLevel('senior')">
+        <div class="lt-icon">🚀</div>
+        <div class="lt-title">Senior / Lead</div>
+        <div class="lt-sub">5+ years experience</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-label">Quick-Select Tech Skills You Know</div>
+    <div class="skill-cloud" id="skillCloud">
+      <span class="sc-chip" onclick="toggleChip(this)">Python</span>
+      <span class="sc-chip" onclick="toggleChip(this)">SQL</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Java</span>
+      <span class="sc-chip" onclick="toggleChip(this)">JavaScript</span>
+      <span class="sc-chip" onclick="toggleChip(this)">React</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Node.js</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Machine Learning</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Deep Learning</span>
+      <span class="sc-chip" onclick="toggleChip(this)">TensorFlow</span>
+      <span class="sc-chip" onclick="toggleChip(this)">PyTorch</span>
+      <span class="sc-chip" onclick="toggleChip(this)">LLM / Generative AI</span>
+      <span class="sc-chip" onclick="toggleChip(this)">NLP</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Data Science</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Tableau</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Excel</span>
+      <span class="sc-chip" onclick="toggleChip(this)">AWS</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Docker</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Kubernetes</span>
+      <span class="sc-chip" onclick="toggleChip(this)">R</span>
+      <span class="sc-chip" onclick="toggleChip(this)">C / C++</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Git / GitHub</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Figma / UI Design</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Project Management</span>
+      <span class="sc-chip" onclick="toggleChip(this)">Cybersecurity</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goToResume()">Continue →</button>
+  </div>
+</div>
+
+<!-- ════════════════ STEP 3: RESUME UPLOAD ════════════════ -->
+<div class="step" id="step3">
+  <div class="step-hero">
+    <div class="step-num-badge">📄 Step 3 of 7</div>
+    <h2>Upload Your Resume</h2>
+    <p>Upload your resume for a full ATS analysis — or paste your text directly below.</p>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-label">Upload Resume File</div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('resumeFile').click()"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="handleDrop(event)">
+      <input type="file" id="resumeFile" accept=".txt,.pdf" onchange="handleFileUpload(this)">
+      <div class="uz-icon">📎</div>
+      <div class="uz-title">Click to upload or drag & drop</div>
+      <div class="uz-sub">Supports TXT and PDF (text-layer) files</div>
+      <div class="uz-success" id="fileSuccess"></div>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-label">Or Paste Resume Text Directly</div>
+    <div class="field">
+      <textarea id="resumeText" style="min-height:160px" placeholder="Paste your entire resume here…&#10;&#10;Include: Summary, Skills, Experience, Education, Projects, Certifications…"></textarea>
+      <div class="field-hint">The more detail you provide, the more accurate your ATS score will be.</div>
+    </div>
+  </div>
+
+  <div class="alert-box alert-tip">
+    <div class="alert-icon">💡</div>
+    <div>
+      <div class="alert-title">Pro Tip: Boost your ATS score</div>
+      <div class="alert-body">Include keywords like specific tools (Python, AWS, Docker), job titles, measurable results, and certifications. ATS systems scan for exact keyword matches.</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+    <button class="btn btn-primary" onclick="runAnalysis()">🤖 Analyze My Profile →</button>
+    <button class="btn btn-ghost" onclick="skipResume()" style="font-size:.78rem;padding:.6rem 1.2rem">Skip Resume →</button>
+  </div>
+</div>
+
+<!-- ════════════════ STEP 4: ATS REPORT ════════════════ -->
+<div class="step" id="step4">
+  <div class="step-hero">
+    <div class="step-num-badge">📊 Step 4 of 7</div>
+    <h2>Your ATS Analysis Report</h2>
+    <p>AI-powered profile analysis based on your resume and skills.</p>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-label">Overall ATS Match Score</div>
+    <div class="ats-grid">
+      <div class="score-circle-wrap">
+        <div class="score-circle">
+          <svg viewBox="0 0 120 120" width="120" height="120">
+            <circle class="score-bg" cx="60" cy="60" r="52"/>
+            <circle class="score-fg" id="scoreFg" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg>
+          <div>
+            <div class="score-num" id="atsScoreNum">0</div>
+            <div class="score-lbl">ATS Score</div>
+          </div>
+        </div>
+        <div id="scoreGrade" style="font-size:.78rem;font-weight:700;margin-top:.3rem"></div>
+      </div>
+      <div>
+        <div class="metric-box" style="margin-bottom:.8rem">
+          <div class="mb-label">🎯 Predicted Role</div>
+          <div class="mb-value" id="predictedRole">—</div>
+          <div class="mb-sub" id="seniorityTier">—</div>
+        </div>
+        <div class="metric-box">
+          <div class="mb-label">🛠️ Skills Found</div>
+          <div class="mb-value" id="skillFoundCount">0 skills</div>
+          <div class="bar-track" style="margin-top:.5rem"><div class="bar-fill bar-accent" id="skillBar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-label">Detailed Score Breakdown</div>
+    <div id="scoreBreakdown"></div>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-label">Detected Skills</div>
+    <div class="tag-row" id="detectedSkillTags"></div>
+    <hr class="divider">
+    <div class="card-label" style="margin-top:.5rem">Skills to Add for Better Score</div>
+    <div class="tag-row" id="missingSkillTags"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+    <button class="btn btn-primary" onclick="goStep(5)">View Career Tips →</button>
+  </div>
+</div>
+
+<!-- ════════════════ STEP 5: CAREER TIPS ════════════════ -->
+<div class="step" id="step5">
+  <div class="step-hero">
+    <div class="step-num-badge">🗺️ Step 5 of 7</div>
+    <h2>Career Intelligence &amp; Roadmap</h2>
+    <p>AI-generated gap analysis, actionable tips and your strategic learning path.</p>
+  </div>
+
+  <div id="gapAlertBox"></div>
+
+  <div class="glass-card">
+    <div class="card-label">Your Strategic Upskilling Roadmap</div>
+    <div class="roadmap-list" id="roadmapList"></div>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-label">Career Growth Tips for Your Level</div>
+    <div id="careerTipsList"></div>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-label">Industry Insights for <span id="domainInsightLabel">Your Domain</span></div>
+    <div id="industryInsights"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
+    <button class="btn btn-primary" onclick="goStep(6)">View Recommended Courses →</button>
+  </div>
+</div>
+
+<!-- ════════════════ STEP 6: COURSES ════════════════ -->
+<div class="step" id="step6">
+  <div class="step-hero">
+    <div class="step-num-badge">🎓 Step 6 of 7</div>
+    <h2>Your Personalized Courses</h2>
+    <p>100 curated courses matched to your level, gaps and target domain.</p>
+  </div>
+
+  <!-- AI Picks -->
+  <div class="glass-card">
+    <div class="courses-header">
+      <div class="courses-title">🤖 AI-Recommended for You</div>
+      <div id="recLevelBadge" class="level-badge lb-int">Mid-Level</div>
+    </div>
+    <div class="course-grid" id="aiRecommendedGrid"></div>
+  </div>
+
+  <!-- Browse All -->
+  <div class="glass-card" style="margin-top:1.5rem">
+    <div class="courses-header">
+      <div class="courses-title">📚 Browse All 100 Courses</div>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="browseSearch" placeholder="Search by title, skill, platform…" oninput="renderBrowse()">
+    </div>
+    <div class="domain-scroller" id="domainScroller"></div>
+    <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap">
+      <select id="browseLevelF" onchange="renderBrowse()" style="padding:.45rem .75rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.78rem;outline:none">
+        <option value="">All Levels</option>
+        <option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>All Levels</option>
+      </select>
+      <select id="browseCostF" onchange="renderBrowse()" style="padding:.45rem .75rem;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.78rem;outline:none">
+        <option value="">All Prices</option>
+        <option value="free">🟢 Free</option>
+        <option value="freemium">🟡 Freemium</option>
+        <option value="paid">🔴 Paid</option>
+      </select>
+      <div style="margin-left:auto;font-size:.75rem;color:var(--muted);align-self:center" id="browseCount"></div>
+    </div>
+    <div class="course-grid" id="browseGrid"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goStep(5)">← Back</button>
+    <button class="btn btn-primary" onclick="goStep(7)">Share Feedback →</button>
+  </div>
+</div>
+
+<!-- ════════════════ STEP 7: FEEDBACK ════════════════ -->
+<div class="step" id="step7">
+  <div class="step-hero">
+    <div class="step-num-badge">⭐ Step 7 of 7</div>
+    <h2>Share Your Feedback</h2>
+    <p>Help us improve the OPTIMIZE MOOC system. Your opinion matters!</p>
+  </div>
+
+  <div class="glass-card" id="feedbackForm">
+    <div class="card-label">Rate Your Experience</div>
+    <div class="field">
+      <label>Overall Rating</label>
+      <div class="star-row" id="starRow">
+        <button class="star-btn" data-v="1" onclick="setRating(1)">☆</button>
+        <button class="star-btn" data-v="2" onclick="setRating(2)">☆</button>
+        <button class="star-btn" data-v="3" onclick="setRating(3)">☆</button>
+        <button class="star-btn" data-v="4" onclick="setRating(4)">☆</button>
+        <button class="star-btn" data-v="5" onclick="setRating(5)">☆</button>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="field">
+      <label>How accurate was the ATS score?</label>
+      <div class="radio-pills" id="accuracyPills">
+        <div class="rpill" onclick="selectPill(this,'accuracy')">Very Accurate</div>
+        <div class="rpill" onclick="selectPill(this,'accuracy')">Mostly Accurate</div>
+        <div class="rpill" onclick="selectPill(this,'accuracy')">Somewhat Accurate</div>
+        <div class="rpill" onclick="selectPill(this,'accuracy')">Not Accurate</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Were the course recommendations helpful?</label>
+      <div class="radio-pills" id="helpfulPills">
+        <div class="rpill" onclick="selectPill(this,'helpful')">Very Helpful 🔥</div>
+        <div class="rpill" onclick="selectPill(this,'helpful')">Helpful 👍</div>
+        <div class="rpill" onclick="selectPill(this,'helpful')">Somewhat 🤷</div>
+        <div class="rpill" onclick="selectPill(this,'helpful')">Not Really 👎</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Which feature did you find most useful?</label>
+      <div class="radio-pills" id="featurePills">
+        <div class="rpill" onclick="selectPill(this,'feature')">ATS Score</div>
+        <div class="rpill" onclick="selectPill(this,'feature')">Career Roadmap</div>
+        <div class="rpill" onclick="selectPill(this,'feature')">Course Recommendations</div>
+        <div class="rpill" onclick="selectPill(this,'feature')">Gap Analysis</div>
+        <div class="rpill" onclick="selectPill(this,'feature')">All of them!</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>💬 Any suggestions or comments?</label>
+      <textarea id="feedbackText" placeholder="Tell us what worked well, what to improve, or any courses you'd like to see added…"></textarea>
+    </div>
+    <div class="field">
+      <label>📧 Email for follow-up (optional)</label>
+      <input type="email" id="feedbackEmail" placeholder="Same or different email is fine">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-lg" onclick="submitFeedback()">🚀 Submit Feedback</button>
+    </div>
+  </div>
+
+  <!-- Success -->
+  <div id="feedbackDone" style="display:none">
+    <div class="done-wrap">
+      <div class="done-icon">🎉</div>
+      <div class="done-title">Thank You!</div>
+      <div class="done-sub">Your feedback has been recorded. We'll use it to make OPTIMIZE even better for learners like you.</div>
+      <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="goStep(6)">← Back to Courses</button>
+        <button class="btn btn-ghost" onclick="goStep(1)">Start Over</button>
+        <a href="mailto:kasthuria349@gmail.com?subject=MOOC Feedback from System" class="btn btn-ghost">📧 Email Us Directly</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrapper -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let STATE = {
+  email: '',
+  profileMethod: 'manual',
+  selectedLevel: 'mid',
+  selectedSkills: [],
+  pastCourses: '',
+  projects: '',
+  targetDomain: '',
+  resumeText: '',
+  atsScore: 0,
+  analysis: null,
+  rating: 0,
+  activeDomain: '',
+  currentStep: 1
+};
+
+// ═══════════════════════════════════════════════════════════
+// STEP NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function goStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  STATE.currentStep = n;
+  updateProgress(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (n === 6) { buildRecommended(); buildDomainScroller(); renderBrowse(); }
+}
+
+function updateProgress(n) {
+  document.querySelectorAll('.ps-item').forEach(item => {
+    const s = parseInt(item.dataset.step);
+    item.classList.remove('active', 'done');
+    if (s < n) item.classList.add('done');
+    if (s === n) item.classList.add('active');
+    // update dot content
+    const dot = item.querySelector('.ps-dot');
+    if (s < n) dot.innerHTML = '✓';
+    else dot.innerHTML = s;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// STEP 1: EMAIL
+// ═══════════════════════════════════════════════════════════
+function verifyEmail() {
+  const val = document.getElementById('emailInput').value.trim();
+  const err = document.getElementById('emailErr');
+  if (!val.match(/^[\w\.\-\+]+@[\w\-]+\.[\w\.]{2,}$/)) {
+    err.classList.add('show');
+    document.getElementById('emailInput').focus();
+    return;
+  }
+  err.classList.remove('show');
+  STATE.email = val;
+  goStep(2);
+}
+
+// ═══════════════════════════════════════════════════════════
+// STEP 2: PROFILE
+// ═══════════════════════════════════════════════════════════
+function selectProfileMethod(m) {
+  STATE.profileMethod = m;
+  document.getElementById('tile-manual').classList.toggle('selected', m === 'manual');
+  document.getElementById('tile-resume').classList.toggle('selected', m === 'resume');
+  document.getElementById('manualSection').style.display = m === 'manual' ? 'block' : 'none';
+}
+
+function selectLevel(l) {
+  STATE.selectedLevel = l;
+  ['junior','mid','senior'].forEach(x => document.getElementById('lvl-'+x).classList.remove('selected'));
+  document.getElementById('lvl-'+l).classList.add('selected');
+}
+
+function toggleChip(el) {
+  el.classList.toggle('on');
+  STATE.selectedSkills = [...document.querySelectorAll('.sc-chip.on')].map(e => e.textContent.trim());
+}
+
+function goToResume() {
+  STATE.pastCourses = document.getElementById('pastCourses').value;
+  STATE.projects    = document.getElementById('projects').value;
+  STATE.targetDomain = document.getElementById('targetDomain').value;
+  goStep(3);
+}
+
+// ═══════════════════════════════════════════════════════════
+// STEP 3: RESUME UPLOAD
+// ═══════════════════════════════════════════════════════════
+function handleFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('fileSuccess').textContent = '✅ Loaded: ' + file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    STATE.resumeText = e.target.result;
+    document.getElementById('resumeText').value = e.target.result.slice(0, 2000);
+  };
+  reader.readAsText(file);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      STATE.resumeText = ev.target.result;
+      document.getElementById('resumeText').value = ev.target.result.slice(0,2000);
+      document.getElementById('fileSuccess').textContent = '✅ Loaded: ' + file.name;
+    };
+    reader.readAsText(file);
+  }
+}
+
+function skipResume() {
+  STATE.resumeText = buildManualText();
+  computeAnalysis(false);
+  goStep(4);
+}
+
+function runAnalysis() {
+  const pasted = document.getElementById('resumeText').value.trim();
+  if (pasted) STATE.resumeText = pasted;
+  else STATE.resumeText = buildManualText();
+  computeAnalysis(!!pasted || !!document.getElementById('fileSuccess').textContent);
+  goStep(4);
+}
+
+function buildManualText() {
+  const lvlMap = { junior:'junior fresher entry level', mid:'professional analyst developer engineer', senior:'senior lead manager architect principal 5+' };
+  return [
+    STATE.pastCourses,
+    STATE.projects,
+    STATE.targetDomain,
+    STATE.selectedSkills.join(' '),
+    lvlMap[STATE.selectedLevel] || ''
+  ].join(' ');
+}
+
+// ═══════════════════════════════════════════════════════════
+// ANALYSIS ENGINE
+// ═══════════════════════════════════════════════════════════
+const TECH_SKILLS = [
+  'python','sql','java','javascript','react','node','express','html','css','typescript',
+  'machine learning','deep learning','tensorflow','pytorch','nlp','llm','generative ai',
+  'data science','data analysis','tableau','power bi','excel','r programming',
+  'aws','azure','gcp','docker','kubernetes','ci/cd','terraform','devops',
+  'pandas','numpy','scikit','matplotlib','seaborn','mongodb','mysql','postgresql',
+  'git','github','linux','bash','api','rest','graphql','cybersecurity','figma',
+  'agile','scrum','project management','c++','c programming'
+];
+
+const MISSING_MAP = {
+  senior: ['LLM / Generative AI','MLOps','System Design','Distributed Systems','Cloud Architecture'],
+  mid:    ['Cloud (AWS/GCP/Azure)','Docker / Kubernetes','ML Pipeline','REST API','SQL Advanced'],
+  junior: ['Python','SQL','Git / GitHub','Data Visualization','Statistics']
+};
+
+function computeAnalysis(hasResume) {
+  const text = (STATE.resumeText + ' ' + STATE.selectedSkills.join(' ')).toLowerCase();
+  let score = 0;
+  const sections = {
+    'Experience Section':    ['experience','work history','employment'],
+    'Education Section':     ['education','degree','university','college','bachelor','master'],
+    'Projects Section':      ['project','portfolio','built','developed','deployed'],
+    'Certifications':        ['certificate','certification','certified','course','credential'],
+    'Contact Information':   ['@','phone','linkedin','github','email']
+  };
+  const breakdown = [];
+  for (const [label, keys] of Object.entries(sections)) {
+    const found = keys.some(k => text.includes(k));
+    const pts = found ? (label === 'Contact Information' ? 10 : 8) : 0;
+    score += pts;
+    breakdown.push({ label, found, pts, max: label === 'Contact Information' ? 10 : 8 });
+  }
+
+  const foundSkills = TECH_SKILLS.filter(s => text.includes(s));
+  const skillPts = Math.min(foundSkills.length * 5, 50);
+  score += skillPts;
+  score = Math.min(score + (hasResume ? 5 : 0), 100);
+
+  const level = (STATE.selectedLevel === 'senior' || text.match(/senior|lead|manager|architect|principal/))
+    ? 'High' : (STATE.selectedLevel === 'junior' ? 'Low' : 'Middle');
+
+  let gap, roadmap, prediction;
+  if (level === 'High') {
+    if (!text.includes('llm') && !text.includes('generative') && !text.includes('gpt')) {
+      gap = { title:'Missing Generative AI / LLM Skills', body:'Generative AI (LLMs, RAG, fine-tuning) is now table-stakes for Senior AI/Data roles. Recruiters actively filter for these skills. Adding them could boost your score by 15–20 points.' };
+      prediction = 'Senior AI / Data Lead'; roadmap = [
+        { title:'Master LLM Fundamentals', desc:'Study tokenization, attention mechanisms, and prompt engineering via Karpathy\'s "Build GPT" on YouTube (free).' },
+        { title:'Build a RAG Application', desc:'Implement Retrieval-Augmented Generation using LangChain + FAISS. Deploy on Hugging Face Spaces for your portfolio.' },
+        { title:'Learn MLOps Basics', desc:'Complete the AWS MLOps specialization on Coursera. Set up automated model training and monitoring pipelines.' },
+        { title:'Target Senior/Principal Roles', desc:'Update your LinkedIn with LLM project demos. Apply for AI Lead positions at product-focused companies.' }
+      ];
+    } else {
+      gap = { title:'Niche Specialization Needed', body:'Strong foundation. Differentiate with MLOps, distributed systems, or a specific industry vertical (FinTech AI, Healthcare ML) to stand out at Principal/Staff level.' };
+      prediction = 'AI Architect / Staff Engineer'; roadmap = [
+        { title:'Master Cloud-Native MLOps', desc:'Build production ML pipelines on Vertex AI or SageMaker. Focus on monitoring, retraining, and A/B testing.' },
+        { title:'Contribute to Open Source', desc:'Submit PRs to LangChain, HuggingFace, or LlamaIndex. This signals expertise better than certifications.' },
+        { title:'System Design for ML', desc:'Study ML system design from the "Designing Machine Learning Systems" book and practice mock interviews.' },
+        { title:'Apply for Staff/Principal Roles', desc:'Target tech companies (FAANG, AI startups). Staff engineers command 40–80% salary premium over seniors.' }
+      ];
+    }
+  } else if (level === 'Low') {
+    gap = { title:'Foundational Skills Gap Detected', body:'Python and SQL are the two most-required tools for any tech/data role. Without them, most job applications won\'t pass ATS filters. Start here before anything else.' };
+    prediction = 'Junior Data Analyst / Developer'; roadmap = [
+      { title:'Learn Python Basics', desc:'Complete "Python for Everybody" on Coursera (free audit). Build 2–3 small projects: a web scraper, a data cleaner, a simple ML model.' },
+      { title:'Master SQL Fundamentals', desc:'Take the freeCodeCamp "Relational Database" cert (free). Practice on LeetCode SQL section and Mode Analytics.' },
+      { title:'Build a Portfolio', desc:'Create a GitHub profile. Add 3 projects with READMEs. Solve 20+ Kaggle "Getting Started" challenges.' },
+      { title:'Get Your First Role', desc:'Complete Google Data Analytics Certificate. Apply for Junior Analyst, Data Intern, or Associate Developer roles with your portfolio.' }
+    ];
+  } else {
+    if (!text.includes('python') || !text.includes('sql')) {
+      gap = { title:'Core Tech Stack Gap', body:'Python and SQL were not detected. These are required for 80%+ of mid-level data and engineering roles. Adding them could open significantly more opportunities.' };
+      prediction = 'Data Analyst / Developer';
+    } else {
+      gap = { title:'Cloud & ML Specialization Needed', body:'Strong core skills detected. Add cloud certification (AWS/GCP) and a deployed ML project to break into Senior roles. These are the most common gaps at mid-level.' };
+      prediction = 'Senior Analyst / ML Engineer Track';
+    }
+    roadmap = [
+      { title:'Earn a Cloud Certification', desc:'Complete AWS Cloud Practitioner (free digital training). This unlocks 30%+ more job options at mid-level.' },
+      { title:'Complete ML Specialization', desc:'Andrew Ng\'s Machine Learning Specialization on Coursera. Most impactful ML course for job placement.' },
+      { title:'Build Deployment Portfolio', desc:'Deploy an ML model as a REST API (Flask + Docker). Host on AWS EC2 or GCP App Engine. Essential for mid→senior transition.' },
+      { title:'Advance to Senior Track', desc:'Apply for Senior Analyst or ML Engineer roles. Target companies doing digital transformation — highest demand for your profile.' }
+    ];
+  }
+
+  const missingSkills = (MISSING_MAP[STATE.selectedLevel] || MISSING_MAP.mid)
+    .filter(s => !text.includes(s.toLowerCase().split('/')[0].trim()));
+
+  STATE.analysis = { score, breakdown, foundSkills, missingSkills, level, gap, roadmap, prediction, hasResume };
+  renderAtsReport();
+  renderCareerTips();
+}
+
+// ═══════════════════════════════════════════════════════════
+// STEP 4: RENDER ATS REPORT
+// ═══════════════════════════════════════════════════════════
+function renderAtsReport() {
+  const { score, breakdown, foundSkills, missingSkills, prediction, level, hasResume } = STATE.analysis;
+
+  // Animate score circle
+  const pct = hasResume ? score : 0;
+  const circumference = 326.7;
+  const offset = circumference - (pct / 100) * circumference;
+  setTimeout(() => {
+    document.getElementById('scoreFg').style.strokeDashoffset = offset;
+    document.getElementById('atsScoreNum').textContent = hasResume ? pct : 'N/A';
+    const fg = document.getElementById('scoreFg');
+    if (pct >= 75) fg.style.stroke = '#10b981';
+    else if (pct >= 50) fg.style.stroke = '#fbbf24';
+    else if (pct > 0) fg.style.stroke = '#ef4444';
+  }, 200);
+
+  // Grade
+  const gradeEl = document.getElementById('scoreGrade');
+  if (!hasResume) { gradeEl.textContent = 'Manual Mode'; gradeEl.style.color = 'var(--muted)'; }
+  else if (pct >= 80) { gradeEl.innerHTML = '🏆 Excellent Match'; gradeEl.style.color = '#10b981'; }
+  else if (pct >= 65) { gradeEl.innerHTML = '👍 Good Match'; gradeEl.style.color = '#fbbf24'; }
+  else if (pct >= 45) { gradeEl.innerHTML = '⚠️ Needs Work'; gradeEl.style.color = '#f97316'; }
+  else { gradeEl.innerHTML = '❌ Low Match'; gradeEl.style.color = '#ef4444'; }
+
+  document.getElementById('predictedRole').textContent = prediction;
+  document.getElementById('seniorityTier').textContent = level === 'High' ? 'Senior / Lead (5+ yrs)' : level === 'Low' ? 'Junior / Entry-Level' : 'Mid-Level (2–4 yrs)';
+  document.getElementById('skillFoundCount').textContent = foundSkills.length + ' skills detected';
+  setTimeout(() => { document.getElementById('skillBar').style.width = Math.min(foundSkills.length * 5, 100) + '%'; }, 300);
+
+  // Breakdown bars
+  const bd = document.getElementById('scoreBreakdown');
+  bd.innerHTML = breakdown.map(b => `
+    <div style="margin-bottom:.9rem">
+      <div style="display:flex;justify-content:space-between;font-size:.75rem;font-weight:600;margin-bottom:.25rem">
+        <span style="color:${b.found?'var(--text)':'var(--muted)'}">${b.found?'✅':'❌'} ${b.label}</span>
+        <span style="color:${b.found?'var(--green)':'var(--red)'}">${b.pts}/${b.max}</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill ${b.found?'bar-green':'bar-red'}" style="width:${b.found?100:0}%;transition:width .8s ease"></div></div>
+    </div>
+  `).join('') + `
+    <div style="margin-top:1rem;padding:.8rem;background:var(--s2);border-radius:8px;border:1px solid var(--border)">
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:.35rem;font-weight:600">SKILL POINTS</div>
+      <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.3rem">
+        <span>${foundSkills.length} skills × 5pts each</span>
+        <span style="color:var(--accent);font-weight:700">${Math.min(foundSkills.length*5,50)}/50</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill bar-accent" id="skillBreakBar" style="width:0%;transition:width 1s ease"></div></div>
+    </div>
+  `;
+  setTimeout(() => { const b = document.getElementById('skillBreakBar'); if(b) b.style.width = Math.min(foundSkills.length*10, 100)+'%'; }, 400);
+
+  // Found skills
+  document.getElementById('detectedSkillTags').innerHTML = foundSkills.length
+    ? foundSkills.map(s => `<span class="tag tag-found">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`).join('')
+    : `<span class="tag tag-miss">No tech skills detected</span>`;
+
+  // Missing skills
+  document.getElementById('missingSkillTags').innerHTML = missingSkills.length
+    ? missingSkills.map(s => `<span class="tag tag-miss">${s}</span>`).join('')
+    : `<span class="tag tag-found">✅ No critical gaps for your level!</span>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// STEP 5: RENDER CAREER TIPS
+// ═══════════════════════════════════════════════════════════
+function renderCareerTips() {
+  const { gap, roadmap, level } = STATE.analysis;
+
+  // Gap alert
+  document.getElementById('gapAlertBox').innerHTML = `
+    <div class="alert-box alert-warn" style="margin-bottom:1.5rem">
+      <div class="alert-icon">⚠️</div>
+      <div>
+        <div class="alert-title">${gap.title}</div>
+        <div class="alert-body">${gap.body}</div>
+      </div>
+    </div>
+  `;
+
+  // Roadmap
+  document.getElementById('roadmapList').innerHTML = roadmap.map((r,i) => `
+    <div class="rm-item">
+      <div class="rm-num">${i+1}</div>
+      <div>
+        <div class="rm-title">${r.title}</div>
+        <div class="rm-desc">${r.desc}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Career tips by level
+  const tips = {
+    High: [
+      { icon:'🏗️', title:'Build in Public', body:'Share your AI projects on LinkedIn, GitHub, and X (Twitter). Senior/Staff roles are filled through network referrals 60%+ of the time. Visibility = opportunity.' },
+      { icon:'📝', title:'Write Technical Articles', body:'Post on Medium or Dev.to about ML problems you\'ve solved. It builds credibility, improves your writing, and attracts recruiters.' },
+      { icon:'🎙️', title:'Speak at Conferences', body:'Submit talks to local meetups or virtual conferences (NeurIPS, PyCon). Speakers are seen as domain experts and get direct reach-outs from hiring managers.' },
+      { icon:'💰', title:'Negotiate Aggressively', body:'Senior AI engineers are in high demand. Use Levels.fyi to benchmark compensation. Expect 20–40% negotiation room above initial offers.' }
+    ],
+    Middle: [
+      { icon:'🚀', title:'Deploy Something Real', body:'Deployed projects > side projects. Put your ML model on AWS or GCP with a live URL. Interviewers can see it, not just read about it.' },
+      { icon:'📊', title:'Quantify Your Impact', body:'Update your resume with numbers: "Reduced pipeline runtime by 35%", "Analyzed 2M+ rows", "Built dashboard used by 50 stakeholders". Metrics beat descriptions.' },
+      { icon:'🎓', title:'Target a Cloud Cert', body:'AWS, GCP, or Azure certifications are quick wins (4–8 weeks prep) that unlock new job categories and justify salary increases.' },
+      { icon:'🤝', title:'Attend Tech Meetups', body:'Join local Python, Data Science, or AWS user group meetups. Most mid-level roles are filled through community referrals, not cold applications.' }
+    ],
+    Low: [
+      { icon:'🔨', title:'Build Before You Apply', body:'Have at least 3 GitHub projects before sending any applications. Recruiters look at your GitHub profile. Projects show you can do the work.' },
+      { icon:'📚', title:'One Skill at a Time', body:'Don\'t learn 10 things at once. Master Python → SQL → one domain (Data Analysis OR Web Dev). Depth beats breadth at junior level.' },
+      { icon:'🌐', title:'Leverage Free Certifications', body:'Google, IBM, and freeCodeCamp offer free certifications. The Google Data Analytics and Meta Developer certs have strong brand recognition.' },
+      { icon:'💌', title:'Apply Volume + Personalize', body:'Send 10+ applications/week but customize each cover letter. Mention the company\'s recent work. Junior roles are competitive — volume + personalization wins.' }
+    ]
+  };
+
+  const levelTips = tips[STATE.analysis.level] || tips.Middle;
+  document.getElementById('careerTipsList').innerHTML = levelTips.map(t => `
+    <div class="alert-box alert-tip" style="margin-bottom:.75rem">
+      <div class="alert-icon">${t.icon}</div>
+      <div>
+        <div class="alert-title">${t.title}</div>
+        <div class="alert-body">${t.body}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Domain insight label
+  const dom = STATE.targetDomain || 'Your Domain';
+  document.getElementById('domainInsightLabel').textContent = dom;
+
+  // Industry insights
+  const insights = getIndustryInsights(STATE.targetDomain, STATE.analysis.level);
+  document.getElementById('industryInsights').innerHTML = insights.map(ins => `
+    <div class="alert-box alert-info" style="margin-bottom:.65rem">
+      <div class="alert-icon">${ins.icon}</div>
+      <div>
+        <div class="alert-title">${ins.title}</div>
+        <div class="alert-body">${ins.body}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function getIndustryInsights(domain, level) {
+  const d = (domain || '').toLowerCase();
+  if (d.includes('data') || d.includes('ml') || d.includes('ai')) return [
+    { icon:'📈', title:'AI / ML Market is Booming', body:'The global AI market is projected to exceed $300B by 2026. Data Scientists and ML Engineers remain among the top 3 most in-demand tech roles globally.' },
+    { icon:'💡', title:'LLMs are Reshaping Job Descriptions', body:'60%+ of new "Data Scientist" job postings now mention LLMs, RAG, or Generative AI. Add these to your skillset to stay relevant.' },
+    { icon:'🏢', title:'Top Hiring Companies', body:'Google DeepMind, Meta AI, OpenAI, Databricks, Snowflake, and every major bank are heavily hiring AI/ML talent. Salaries range ₹25L–₹2Cr+ in India.' }
+  ];
+  if (d.includes('web') || d.includes('frontend') || d.includes('fullstack') || d.includes('react')) return [
+    { icon:'🌐', title:'Full Stack Demand Remains Strong', body:'React + Node.js skills are required in 40%+ of front-end job postings. TypeScript proficiency has become a near-requirement at mid-senior level.' },
+    { icon:'🛠️', title:'Next.js and Server Components', body:'Next.js adoption has grown 3x in 2 years. Server Components and App Router are now standard. Teams migrating from Pages Router need these skills.' },
+    { icon:'💰', title:'Freelance Market is Huge', body:'Web developers can earn ₹3,000–₹15,000/hr freelancing on Toptal, Upwork, or Fiverr. A strong portfolio is your best asset.' }
+  ];
+  if (d.includes('cyber') || d.includes('security')) return [
+    { icon:'🔐', title:'Critical Skills Shortage', body:'There are 3.5 million unfilled cybersecurity jobs globally. Entry-level analysts with certifications (CompTIA Security+, CEH) are in very high demand.' },
+    { icon:'⚠️', title:'Ransomware and Cloud Security', body:'Cloud security and ransomware incident response are the two fastest-growing sub-fields. AWS Security Specialty and CEH certifications command premium salaries.' },
+    { icon:'📋', title:'Regulatory Compliance Driving Demand', body:'GDPR, SOC2, and India\'s DPDP Act are forcing companies to hire compliance-focused security professionals. This is a high-stability career track.' }
+  ];
+  if (d.includes('cloud') || d.includes('devops')) return [
+    { icon:'☁️', title:'Multi-Cloud is Standard', body:'85%+ of enterprises use 2+ cloud providers. Engineers proficient in both AWS and GCP/Azure command 25–40% salary premium.' },
+    { icon:'🔄', title:'Platform Engineering is Rising', body:'"Platform Engineer" and "DevOps Engineer" are merging into "Platform Engineering". Kubernetes, Terraform, and ArgoCD are the new core stack.' },
+    { icon:'💼', title:'Remote-First Roles', body:'Cloud/DevOps roles have the highest remote-first adoption (75%+). You can work for US/EU companies from India at near-parity compensation.' }
+  ];
+  // Generic
+  return [
+    { icon:'📊', title:'Tech Hiring is Rebounding', body:'After the 2023 slowdown, tech hiring accelerated in 2024. AI, cloud, and data roles are leading the recovery with 20%+ YoY growth in open positions.' },
+    { icon:'🌍', title:'Remote Work Expands Your Market', body:'Building skills to work with global teams (async communication, documentation, GitHub workflows) expands your job market from local to worldwide.' },
+    { icon:'🎓', title:'Continuous Learning is Non-Negotiable', body:'The half-life of a tech skill is now ~3 years. Professionals who spend 5+ hours/week learning consistently earn 25–40% more than those who don\'t.' }
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════
+// 100 COURSES DATA
+// ═══════════════════════════════════════════════════════════
+const COURSES = [
+  // PROGRAMMING & CS
+  {domain:"💻 Programming",title:"CS50: Intro to Computer Science",provider:"Harvard",platform:"edX",pc:"plat-edx",level:"Beginner",duration:"12 weeks",cost:"freemium",price:"Free",note:"$149 cert",rating:4.9,reviews:"3M+",desc:"World's most popular CS course. C, Python, SQL, web dev.",topics:["C","Python","SQL","Algorithms"],link:"https://cs50.harvard.edu/x"},
+  {domain:"💻 Programming",title:"Introduction to Algorithms MIT 6.006",provider:"MIT OCW",platform:"MIT OCW",pc:"plat-mit",level:"Intermediate",duration:"Self-paced",cost:"free",price:"FREE",note:"No cert",rating:4.8,reviews:"MIT quality",desc:"Sorting, hashing, dynamic programming, shortest paths.",topics:["Sorting","Graphs","DP","Hashing"],link:"https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/"},
+  {domain:"💻 Programming",title:"Python for Everybody Specialization",provider:"U. Michigan",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"8 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.8,reviews:"600K+",desc:"Python from scratch: data structures, web scraping, databases.",topics:["Python","SQL","APIs","JSON"],link:"https://www.coursera.org/specializations/python"},
+  {domain:"💻 Programming",title:"Java Programming Specialization",provider:"Duke University",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"5 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.6,reviews:"120K+",desc:"Java fundamentals to OOP and real software engineering.",topics:["Java","OOP","Data Structures","APIs"],link:"https://www.coursera.org/specializations/java-programming"},
+  {domain:"💻 Programming",title:"Crash Course Computer Science",provider:"PBS / CrashCourse",platform:"YouTube",pc:"plat-youtube",level:"Beginner",duration:"~8 hrs",cost:"free",price:"FREE",note:"Always free",rating:4.9,reviews:"15M+ views",desc:"40-episode series covering binary to AI. Best CS overview.",topics:["Binary","CPU","OS","Networking"],link:"https://www.youtube.com/playlist?list=PL8dPuuaLjXtNlUrzyH5r6jN9ulIgZBpdo"},
+  {domain:"💻 Programming",title:"Learn Python 3",provider:"Codecademy",platform:"Codecademy",pc:"plat-other",level:"Beginner",duration:"25 hours",cost:"freemium",price:"Free basics",note:"$16/mo Pro",rating:4.6,reviews:"2M+",desc:"Interactive Python 3 — write code in browser from day one.",topics:["Python","Functions","OOP","Files"],link:"https://www.codecademy.com/learn/learn-python-3"},
+  {domain:"💻 Programming",title:"Competitive Programming – NPTEL",provider:"IIT Bombay",platform:"NPTEL",pc:"plat-nptel",level:"Advanced",duration:"12 weeks",cost:"freemium",price:"Free",note:"₹1,000 exam cert",rating:4.6,reviews:"25K+",desc:"Advanced DS, graphs, number theory for competitive programming.",topics:["DP","Graphs","Trees","Number Theory"],link:"https://nptel.ac.in/courses/106/102/106102064/"},
+  {domain:"💻 Programming",title:"C++ For C Programmers",provider:"UC Santa Cruz",platform:"Coursera",pc:"plat-coursera",level:"Intermediate",duration:"6 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.4,reviews:"28K+",desc:"Transition from C to modern C++ with STL and templates.",topics:["C++","STL","Templates","Graphs"],link:"https://www.coursera.org/learn/c-plus-plus-a"},
+  {domain:"💻 Programming",title:"SoloLearn: Learn to Code",provider:"SoloLearn",platform:"SoloLearn",pc:"plat-other",level:"Beginner",duration:"Self-paced",cost:"freemium",price:"Free",note:"$6.99/mo Pro",rating:4.5,reviews:"40M+",desc:"Bite-sized Python, JS, C++, HTML lessons. Mobile-first.",topics:["Python","JavaScript","HTML","SQL"],link:"https://www.sololearn.com/"},
+  {domain:"💻 Programming",title:"SICP — UC Berkeley Lectures",provider:"UC Berkeley",platform:"YouTube",pc:"plat-youtube",level:"Advanced",duration:"Self-paced",cost:"free",price:"FREE",note:"No cert",rating:4.9,reviews:"Classic",desc:"Legendary SICP: functional programming, recursion, interpreters.",topics:["Scheme","Recursion","Abstraction","Interpreters"],link:"https://www.youtube.com/playlist?list=PLhMnuBfGeCDNgVzLPxF9o5UNKG1b-LFY9"},
+  // WEB DEV
+  {domain:"🌐 Web Dev",title:"The Web Developer Bootcamp 2024",provider:"Colt Steele",platform:"Udemy",pc:"plat-udemy",level:"Beginner",duration:"63 hrs",cost:"paid",price:"₹449–₹3,299",note:"Lifetime access",rating:4.7,reviews:"280K+",desc:"HTML to Node.js/Express/MongoDB. Complete full-stack bootcamp.",topics:["HTML","CSS","JavaScript","Node.js","MongoDB"],link:"https://www.udemy.com/course/the-web-developer-bootcamp/"},
+  {domain:"🌐 Web Dev",title:"Responsive Web Design Cert",provider:"freeCodeCamp",platform:"freeCodeCamp",pc:"plat-fcc",level:"Beginner",duration:"300 hrs",cost:"free",price:"FREE",note:"Free cert",rating:4.7,reviews:"Millions",desc:"HTML5 and modern CSS. Build responsive sites, earn free certification.",topics:["HTML5","CSS3","Flexbox","Grid"],link:"https://www.freecodecamp.org/learn/2022/responsive-web-design/"},
+  {domain:"🌐 Web Dev",title:"Full Stack Open",provider:"U. Helsinki",platform:"fullstackopen.com",pc:"plat-full",level:"Intermediate",duration:"~240 hrs",cost:"free",price:"FREE",note:"Uni credits",rating:4.9,reviews:"30K+",desc:"React, Redux, Node.js, TypeScript, GraphQL, Docker. Gold standard.",topics:["React","Node.js","TypeScript","GraphQL"],link:"https://fullstackopen.com/en/"},
+  {domain:"🌐 Web Dev",title:"JavaScript Algorithms & Data Structures",provider:"freeCodeCamp",platform:"freeCodeCamp",pc:"plat-fcc",level:"Intermediate",duration:"300 hrs",cost:"free",price:"FREE",note:"Free cert",rating:4.8,reviews:"Millions",desc:"Master JS: ES6+, OOP, functional programming, algorithms.",topics:["JavaScript","ES6","OOP","Algorithms"],link:"https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/"},
+  {domain:"🌐 Web Dev",title:"React — The Complete Guide 2024",provider:"Maximilian Schwarzmüller",platform:"Udemy",pc:"plat-udemy",level:"Intermediate",duration:"68 hrs",cost:"paid",price:"₹449–₹3,299",note:"Lifetime access",rating:4.7,reviews:"210K+",desc:"Hooks, Redux, React Router, Next.js, TypeScript.",topics:["React","Hooks","Redux","Next.js"],link:"https://www.udemy.com/course/react-the-complete-guide-incl-redux/"},
+  {domain:"🌐 Web Dev",title:"HTML, CSS, JS for Web Developers",provider:"Johns Hopkins",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"5 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"85K+",desc:"Build a restaurant site from scratch. Responsive design, JS.",topics:["HTML","CSS","JavaScript","Bootstrap"],link:"https://www.coursera.org/learn/html-css-javascript-for-web-developers"},
+  {domain:"🌐 Web Dev",title:"Meta Front-End Developer Certificate",provider:"Meta",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"7 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"110K+",desc:"Meta's official front-end: React, HTML, CSS, Figma.",topics:["React","HTML/CSS","JS","Figma"],link:"https://www.coursera.org/professional-certificates/meta-front-end-developer"},
+  {domain:"🌐 Web Dev",title:"Next.js & React — Complete Guide",provider:"Maximilian Schwarzmüller",platform:"Udemy",pc:"plat-udemy",level:"Intermediate",duration:"25 hrs",cost:"paid",price:"₹449–₹2,499",note:"Lifetime access",rating:4.7,reviews:"55K+",desc:"SSR, SSG, API routes, deployment. Definitive Next.js course.",topics:["Next.js","React","SSR","Deployment"],link:"https://www.udemy.com/course/nextjs-react-the-complete-guide/"},
+  {domain:"🌐 Web Dev",title:"CSS for JavaScript Developers",provider:"Josh W. Comeau",platform:"css-for-js.dev",pc:"plat-full",level:"Intermediate",duration:"Self-paced",cost:"paid",price:"$149–$249",note:"One-time",rating:4.9,reviews:"5K+ devs",desc:"Master CSS flexbox, grid, animations for JS devs.",topics:["CSS","Flexbox","Grid","Animations"],link:"https://css-for-js.dev/"},
+  {domain:"🌐 Web Dev",title:"The Complete JavaScript Course 2024",provider:"Jonas Schmedtmann",platform:"Udemy",pc:"plat-udemy",level:"Beginner",duration:"69 hrs",cost:"paid",price:"₹449–₹3,299",note:"Lifetime access",rating:4.8,reviews:"180K+",desc:"Deep dive into JS: closures, prototypes, async/await, DOM.",topics:["JavaScript","DOM","Promises","ES6+"],link:"https://www.udemy.com/course/the-complete-javascript-course/"},
+  // DATA SCIENCE
+  {domain:"📊 Data Science",title:"Google Data Analytics Certificate",provider:"Google",platform:"Coursera",pc:"plat-google",level:"Beginner",duration:"6 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.8,reviews:"450K+",desc:"SQL, R, Tableau. Google's official data analyst path.",topics:["SQL","Tableau","R","Data Cleaning"],link:"https://www.coursera.org/professional-certificates/google-data-analytics"},
+  {domain:"📊 Data Science",title:"IBM Data Science Professional Cert",provider:"IBM",platform:"Coursera",pc:"plat-ibm",level:"Beginner",duration:"10 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.6,reviews:"150K+",desc:"Python, SQL, ML, data viz, Jupyter. IBM's DS program.",topics:["Python","SQL","ML","Jupyter"],link:"https://www.coursera.org/professional-certificates/ibm-data-science"},
+  {domain:"📊 Data Science",title:"Data Science with Python – NPTEL",provider:"IIT Madras",platform:"NPTEL",pc:"plat-nptel",level:"Intermediate",duration:"12 weeks",cost:"freemium",price:"Free",note:"₹1,000 exam cert",rating:4.6,reviews:"50K+",desc:"NumPy, Pandas, Matplotlib, Scikit-learn. IIT Madras.",topics:["NumPy","Pandas","Matplotlib","Scikit-learn"],link:"https://nptel.ac.in/courses/106/106/106106212/"},
+  {domain:"📊 Data Science",title:"Data Analysis with Python – fCC",provider:"freeCodeCamp",platform:"freeCodeCamp",pc:"plat-fcc",level:"Beginner",duration:"300 hrs",cost:"free",price:"FREE",note:"Free cert",rating:4.7,reviews:"Millions",desc:"NumPy, Pandas, Matplotlib, Seaborn, SciPy. Full pipeline.",topics:["NumPy","Pandas","Matplotlib","Seaborn"],link:"https://www.freecodecamp.org/learn/data-analysis-with-python/"},
+  {domain:"📊 Data Science",title:"Applied Data Science with Python",provider:"U. Michigan",platform:"Coursera",pc:"plat-coursera",level:"Intermediate",duration:"5 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.5,reviews:"80K+",desc:"Pandas, Matplotlib, ML, text mining, network analysis.",topics:["Pandas","ML","NLP","NetworkX"],link:"https://www.coursera.org/specializations/data-science-python"},
+  {domain:"📊 Data Science",title:"Python for Data Science Bootcamp",provider:"Jose Portilla",platform:"Udemy",pc:"plat-udemy",level:"Beginner",duration:"25 hrs",cost:"paid",price:"₹449–₹1,999",note:"Lifetime access",rating:4.6,reviews:"95K+",desc:"Python, NumPy, Pandas, Matplotlib, Seaborn, Scikit-Learn.",topics:["Python","NumPy","Pandas","Matplotlib"],link:"https://www.udemy.com/course/python-for-data-science-and-machine-learning-bootcamp/"},
+  {domain:"📊 Data Science",title:"Statistics and Probability",provider:"Khan Academy",platform:"Khan Academy",pc:"plat-khan",level:"Beginner",duration:"Self-paced",cost:"free",price:"FREE",note:"Always free",rating:4.8,reviews:"Millions",desc:"Distributions, hypothesis testing, regression.",topics:["Probability","Distributions","Hypothesis","Regression"],link:"https://www.khanacademy.org/math/statistics-probability"},
+  {domain:"📊 Data Science",title:"Data Science Specialization – JHU",provider:"Johns Hopkins",platform:"Coursera",pc:"plat-coursera",level:"Intermediate",duration:"11 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.5,reviews:"80K+",desc:"R, statistical inference, regression, ML. Capstone.",topics:["R","Statistical Inference","Regression","ML"],link:"https://www.coursera.org/specializations/jhu-data-science"},
+  {domain:"📊 Data Science",title:"Intro to ML – Kaggle Learn",provider:"Kaggle",platform:"Kaggle",pc:"plat-kaggle",level:"Beginner",duration:"5 hrs",cost:"free",price:"FREE",note:"Free cert",rating:4.7,reviews:"500K+",desc:"Python, Pandas, visualization, ML. Learn by competing.",topics:["Python","Pandas","ML","Kaggle"],link:"https://www.kaggle.com/learn/intro-to-machine-learning"},
+  {domain:"📊 Data Science",title:"Complete ML & Data Science Bootcamp",provider:"Zero to Mastery",platform:"Udemy",pc:"plat-udemy",level:"All Levels",duration:"43 hrs",cost:"paid",price:"₹449–₹2,499",note:"Lifetime access",rating:4.6,reviews:"55K+",desc:"Python to ML deployment. TensorFlow, scikit-learn.",topics:["Python","TensorFlow","scikit-learn","Deployment"],link:"https://www.udemy.com/course/complete-machine-learning-and-data-science-zero-to-mastery/"},
+  // AI & ML
+  {domain:"🤖 AI / ML",title:"Machine Learning Specialization",provider:"Stanford / deeplearning.ai",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"3 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.9,reviews:"170K+",desc:"Andrew Ng's legendary ML course. Regression, classification, NN.",topics:["Regression","Neural Nets","Trees","Clustering"],link:"https://www.coursera.org/specializations/machine-learning-introduction"},
+  {domain:"🤖 AI / ML",title:"Deep Learning Specialization",provider:"deeplearning.ai",platform:"Coursera",pc:"plat-coursera",level:"Intermediate",duration:"5 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.9,reviews:"120K+",desc:"CNNs, RNNs, Transformers, TensorFlow. Definitive DL program.",topics:["CNN","RNN","Transformers","TensorFlow"],link:"https://www.coursera.org/specializations/deep-learning"},
+  {domain:"🤖 AI / ML",title:"fast.ai: Practical Deep Learning",provider:"fast.ai",platform:"fast.ai",pc:"plat-fast",level:"Intermediate",duration:"Self-paced",cost:"free",price:"FREE",note:"No cert",rating:4.9,reviews:"Top-rated",desc:"Top-down approach. Train state-of-the-art models fast.",topics:["PyTorch","Fastai","Vision","NLP"],link:"https://course.fast.ai/"},
+  {domain:"🤖 AI / ML",title:"SWAYAM — Artificial Intelligence",provider:"IIT Kharagpur",platform:"SWAYAM",pc:"plat-swayam",level:"Intermediate",duration:"12 weeks",cost:"freemium",price:"Free",note:"₹1,000 UGC cert",rating:4.5,reviews:"UGC approved",desc:"AI from IIT Kharagpur. Search, planning, ML, NLP.",topics:["Search","Planning","ML","NLP"],link:"https://swayam.gov.in/nd2_noc19_cs71/preview"},
+  {domain:"🤖 AI / ML",title:"Machine Learning with Python – fCC",provider:"freeCodeCamp",platform:"freeCodeCamp",pc:"plat-fcc",level:"Intermediate",duration:"300 hrs",cost:"free",price:"FREE",note:"Free cert",rating:4.7,reviews:"Millions",desc:"TensorFlow, Neural Nets, NLP, reinforcement learning.",topics:["TensorFlow","Neural Nets","NLP","RL"],link:"https://www.freecodecamp.org/learn/machine-learning-with-python/"},
+  {domain:"🤖 AI / ML",title:"AI For Everyone",provider:"deeplearning.ai",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"6 hrs",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.8,reviews:"130K+",desc:"Non-technical AI intro. Strategy, ethics, AI project management.",topics:["AI Strategy","Ethics","Workflow","Data"],link:"https://www.coursera.org/learn/ai-for-everyone"},
+  {domain:"🤖 AI / ML",title:"NLP Specialization",provider:"deeplearning.ai",platform:"Coursera",pc:"plat-coursera",level:"Advanced",duration:"4 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"30K+",desc:"Sentiment analysis, translation, Transformers, BERT.",topics:["Transformers","BERT","Attention","NLP"],link:"https://www.coursera.org/specializations/natural-language-processing"},
+  {domain:"🤖 AI / ML",title:"Build GPT from Scratch – Karpathy",provider:"Andrej Karpathy",platform:"YouTube",pc:"plat-youtube",level:"Advanced",duration:"~8 hrs",cost:"free",price:"FREE",note:"YouTube",rating:5.0,reviews:"5M+ views",desc:"Build GPT in pure Python. Legendary hands-on LLM education.",topics:["Transformers","GPT","Backprop","PyTorch"],link:"https://www.youtube.com/watch?v=kCc8FmEb1nY"},
+  {domain:"🤖 AI / ML",title:"Intro to AI – Udacity",provider:"Sebastian Thrun",platform:"Udacity",pc:"plat-other",level:"Beginner",duration:"3 months",cost:"free",price:"FREE",note:"No cert",rating:4.5,reviews:"Classic",desc:"Search, CSP, planning, Bayesian inference. Solid AI foundations.",topics:["Search","CSP","Planning","Bayes"],link:"https://www.udacity.com/course/intro-to-artificial-intelligence--cs271"},
+  {domain:"🤖 AI / ML",title:"Intro to ML – Kaggle Learn",provider:"Kaggle",platform:"Kaggle",pc:"plat-kaggle",level:"Beginner",duration:"3 hrs",cost:"free",price:"FREE",note:"Free cert",rating:4.7,reviews:"800K+",desc:"Decision trees, random forests, model validation.",topics:["Decision Trees","Random Forest","Validation"],link:"https://www.kaggle.com/learn/intro-to-machine-learning"},
+  // CLOUD
+  {domain:"☁️ Cloud",title:"AWS Cloud Practitioner Essentials",provider:"Amazon Web Services",platform:"AWS",pc:"plat-aws",level:"Beginner",duration:"6 hrs",cost:"free",price:"FREE",note:"Exam extra",rating:4.7,reviews:"1M+",desc:"Core AWS services, cloud concepts, security, pricing.",topics:["EC2","S3","IAM","VPC"],link:"https://aws.amazon.com/training/digital/aws-cloud-practitioner-essentials/"},
+  {domain:"☁️ Cloud",title:"Google Cloud Digital Leader",provider:"Google Cloud",platform:"Coursera",pc:"plat-google",level:"Beginner",duration:"3 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"60K+",desc:"Cloud concepts, Google Cloud services, AI/ML on GCP.",topics:["GCP","BigQuery","AI","Security"],link:"https://www.coursera.org/professional-certificates/google-cloud-digital-leader-training"},
+  {domain:"☁️ Cloud",title:"Microsoft Azure Fundamentals (AZ-900)",provider:"Microsoft",platform:"MS Learn",pc:"plat-microsoft",level:"Beginner",duration:"6 hrs",cost:"free",price:"FREE",note:"Exam fees separate",rating:4.7,reviews:"2M+",desc:"Azure core concepts, services, security, compliance.",topics:["Azure","VMs","Storage","Security"],link:"https://learn.microsoft.com/en-us/training/paths/azure-fundamentals/"},
+  {domain:"☁️ Cloud",title:"Cloud Computing Specialization",provider:"U. Illinois",platform:"Coursera",pc:"plat-coursera",level:"Intermediate",duration:"7 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.5,reviews:"40K+",desc:"Cloud concepts, Hadoop, Spark, distributed systems.",topics:["Cloud","Hadoop","Spark","MapReduce"],link:"https://www.coursera.org/specializations/cloud-computing"},
+  {domain:"☁️ Cloud",title:"AWS Certified Solutions Architect",provider:"Neal Davis",platform:"Udemy",pc:"plat-udemy",level:"Intermediate",duration:"27 hrs",cost:"paid",price:"₹449–₹2,499",note:"Lifetime",rating:4.7,reviews:"75K+",desc:"Full SAA-C03 prep. VPC, EC2, RDS, S3, Lambda.",topics:["EC2","RDS","S3","Lambda","VPC"],link:"https://www.udemy.com/course/aws-certified-solutions-architect-associate-saa-c03/"},
+  {domain:"☁️ Cloud",title:"DevOps on AWS Specialization",provider:"Amazon Web Services",platform:"Coursera",pc:"plat-aws",level:"Intermediate",duration:"4 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.6,reviews:"20K+",desc:"CI/CD pipelines, infrastructure as code, monitoring.",topics:["CodePipeline","CloudFormation","Terraform","Docker"],link:"https://www.coursera.org/specializations/aws-devops"},
+  {domain:"☁️ Cloud",title:"Docker & Kubernetes: Complete Guide",provider:"Stephen Grider",platform:"Udemy",pc:"plat-udemy",level:"Intermediate",duration:"22 hrs",cost:"paid",price:"₹449–₹2,499",note:"Lifetime",rating:4.7,reviews:"65K+",desc:"Containers, Kubernetes clusters, CI/CD.",topics:["Docker","Kubernetes","CI/CD","Networking"],link:"https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/"},
+  {domain:"☁️ Cloud",title:"Architecting with Google Cloud",provider:"Google Cloud",platform:"Coursera",pc:"plat-google",level:"Advanced",duration:"3 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"35K+",desc:"Designing reliable, scalable GCP solutions.",topics:["GCP","Architecture","Reliability","Scalability"],link:"https://www.coursera.org/specializations/gcp-architecture"},
+  // CYBERSECURITY
+  {domain:"🔐 Cybersecurity",title:"Google Cybersecurity Certificate",provider:"Google",platform:"Coursera",pc:"plat-google",level:"Beginner",duration:"6 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.8,reviews:"80K+",desc:"Network security, Linux, SQL, Python, SIEM tools.",topics:["Linux","SQL","Python","SIEM"],link:"https://www.coursera.org/professional-certificates/google-cybersecurity"},
+  {domain:"🔐 Cybersecurity",title:"IBM Cybersecurity Analyst Cert",provider:"IBM",platform:"Coursera",pc:"plat-ibm",level:"Beginner",duration:"8 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.6,reviews:"40K+",desc:"Cyber attacks, network security, incident response.",topics:["Network Security","Incident Response","SIEM"],link:"https://www.coursera.org/professional-certificates/ibm-cybersecurity-analyst"},
+  {domain:"🔐 Cybersecurity",title:"Intro to Cyber Security – NYU",provider:"NYU / Tandon",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"4 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.5,reviews:"50K+",desc:"Software security, network security, OS security.",topics:["Software Security","OS Security","Cryptography"],link:"https://www.coursera.org/specializations/intro-cyber-security"},
+  {domain:"🔐 Cybersecurity",title:"Ethical Hacking & Penetration Testing",provider:"Zaid Sabih",platform:"Udemy",pc:"plat-udemy",level:"Beginner",duration:"15 hrs",cost:"paid",price:"₹449–₹1,799",note:"Lifetime",rating:4.6,reviews:"55K+",desc:"Kali Linux, Metasploit, network hacking, web attacks.",topics:["Kali Linux","Metasploit","Network Hacking"],link:"https://www.udemy.com/course/learn-ethical-hacking-from-scratch/"},
+  {domain:"🔐 Cybersecurity",title:"Cyber Security – IIT Kanpur NPTEL",provider:"IIT Kanpur",platform:"NPTEL",pc:"plat-nptel",level:"Intermediate",duration:"12 weeks",cost:"freemium",price:"Free",note:"₹1,000 cert",rating:4.5,reviews:"30K+",desc:"Cryptography, network security, authentication.",topics:["Cryptography","Authentication","Firewalls"],link:"https://nptel.ac.in/courses/106/104/106104060/"},
+  {domain:"🔐 Cybersecurity",title:"Complete Network Security Course",provider:"Nathan House",platform:"Udemy",pc:"plat-udemy",level:"Intermediate",duration:"12 hrs",cost:"paid",price:"₹449–₹1,799",note:"Lifetime",rating:4.6,reviews:"28K+",desc:"Firewalls, VPNs, Wi-Fi security, IDS/IPS.",topics:["Firewalls","VPN","Wi-Fi","IDS/IPS"],link:"https://www.udemy.com/course/network-security-course/"},
+  {domain:"🔐 Cybersecurity",title:"Cybersecurity for Everyone",provider:"U. Maryland",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"7 hrs",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.6,reviews:"30K+",desc:"Policy, human factors, management overview.",topics:["Policy","Risk","Privacy","Management"],link:"https://www.coursera.org/learn/cybersecurity-for-everyone"},
+  {domain:"🔐 Cybersecurity",title:"Information Security Context & Intro",provider:"U. London",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"15 hrs",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.5,reviews:"25K+",desc:"CIA triad, risk management, access control.",topics:["CIA Triad","Risk Management","Access Control"],link:"https://www.coursera.org/learn/information-security-data"},
+  // UI/UX
+  {domain:"🎨 UI/UX & Design",title:"Google UX Design Certificate",provider:"Google",platform:"Coursera",pc:"plat-google",level:"Beginner",duration:"6 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.8,reviews:"150K+",desc:"Full UX: research, wireframes, prototypes, Figma.",topics:["Figma","UX Research","Wireframes","Prototyping"],link:"https://www.coursera.org/professional-certificates/google-ux-design"},
+  {domain:"🎨 UI/UX & Design",title:"UI/UX Design Specialization – CalArts",provider:"CalArts",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"6 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"60K+",desc:"Visual design, UX research, interaction design.",topics:["Visual Design","Figma","User Research"],link:"https://www.coursera.org/specializations/ui-ux-design"},
+  {domain:"🎨 UI/UX & Design",title:"Figma UI Design — Full Course",provider:"DesignCourse",platform:"YouTube",pc:"plat-youtube",level:"Beginner",duration:"~5 hrs",cost:"free",price:"FREE",note:"YouTube",rating:4.8,reviews:"2M+",desc:"Complete Figma: responsive design, components, auto layout.",topics:["Figma","Components","Auto Layout"],link:"https://www.youtube.com/watch?v=jwCmIBJ8Jtc"},
+  {domain:"🎨 UI/UX & Design",title:"Graphic Design Specialization",provider:"CalArts",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"6 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"45K+",desc:"Typography, composition, imagemaking, branding.",topics:["Typography","Composition","Branding","Color"],link:"https://www.coursera.org/specializations/graphic-design"},
+  {domain:"🎨 UI/UX & Design",title:"Domestika: Graphic Design for Beginners",provider:"Various",platform:"Domestika",pc:"plat-other",level:"Beginner",duration:"~3 hrs",cost:"paid",price:"₹599–₹1,499",note:"Lifetime",rating:4.7,reviews:"30K+",desc:"Creative design with Adobe tools. Beautiful projects.",topics:["Adobe Illustrator","Branding","Color"],link:"https://www.domestika.org/en/courses/2575-graphic-design-for-beginners"},
+  {domain:"🎨 UI/UX & Design",title:"Human-Computer Interaction",provider:"Georgia Tech",platform:"Udacity",pc:"plat-other",level:"Intermediate",duration:"4 months",cost:"free",price:"FREE",note:"No cert",rating:4.6,reviews:"Classic",desc:"Design principles, usability testing, prototyping.",topics:["Usability","Prototyping","Mental Models"],link:"https://www.udacity.com/course/human-computer-interaction--ud400"},
+  // BUSINESS
+  {domain:"💼 Business",title:"Wharton Business Foundations",provider:"Wharton / UPenn",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"5 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"90K+",desc:"Core MBA: accounting, finance, marketing, operations.",topics:["Accounting","Finance","Marketing","Strategy"],link:"https://www.coursera.org/specializations/wharton-business-foundations"},
+  {domain:"💼 Business",title:"Google Project Management Cert",provider:"Google",platform:"Coursera",pc:"plat-google",level:"Beginner",duration:"6 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.8,reviews:"200K+",desc:"Agile, Scrum, project planning, stakeholder management.",topics:["Agile","Scrum","Project Planning","Risk"],link:"https://www.coursera.org/professional-certificates/google-project-management"},
+  {domain:"💼 Business",title:"Financial Markets – Yale",provider:"Robert Shiller / Yale",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"7 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.8,reviews:"300K+",desc:"Stocks, bonds, derivatives from Nobel laureate Shiller.",topics:["Stocks","Bonds","Options","Risk"],link:"https://www.coursera.org/learn/financial-markets-global"},
+  {domain:"💼 Business",title:"Entrepreneurship Specialization",provider:"Wharton / UPenn",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"4 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.6,reviews:"60K+",desc:"Opportunity recognition, startup, growth, funding.",topics:["Startup","Funding","Growth","Pitching"],link:"https://www.coursera.org/specializations/wharton-entrepreneurship"},
+  {domain:"💼 Business",title:"MBA Courses – Alison",provider:"Multiple",platform:"Alison",pc:"plat-other",level:"Beginner",duration:"6–10 hrs",cost:"free",price:"FREE",note:"$12 PDF cert",rating:4.4,reviews:"4M+",desc:"Free MBA-level management, strategy, HR, leadership.",topics:["Management","HR","Leadership","Finance"],link:"https://alison.com/tag/mba"},
+  {domain:"💼 Business",title:"Supply Chain Management",provider:"Rutgers University",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"4 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.6,reviews:"30K+",desc:"Procurement, logistics, demand planning, analytics.",topics:["Procurement","Logistics","Analytics","Lean"],link:"https://www.coursera.org/specializations/supply-chain-management"},
+  {domain:"💼 Business",title:"Digital Marketing – FutureLearn",provider:"Digital Marketing Inst.",platform:"FutureLearn",pc:"plat-other",level:"Beginner",duration:"8 weeks",cost:"freemium",price:"Free audit",note:"$129 cert",rating:4.5,reviews:"50K+",desc:"SEO, social media, PPC, analytics, content strategy.",topics:["SEO","Social Media","PPC","Analytics"],link:"https://www.futurelearn.com/courses/digital-marketing"},
+  {domain:"💼 Business",title:"Introduction to Corporate Finance",provider:"UPenn",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"7 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"50K+",desc:"NPV, IRR, capital budgeting, valuation.",topics:["NPV","IRR","Valuation","Budgeting"],link:"https://www.coursera.org/learn/wharton-introduction-financial-accounting"},
+  // MATH
+  {domain:"∑ Mathematics",title:"Mathematics for Machine Learning",provider:"Imperial College London",platform:"Coursera",pc:"plat-coursera",level:"Intermediate",duration:"4 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.6,reviews:"55K+",desc:"Linear algebra, calculus, PCA for ML.",topics:["Linear Algebra","Calculus","PCA","Optimization"],link:"https://www.coursera.org/specializations/mathematics-machine-learning"},
+  {domain:"∑ Mathematics",title:"Linear Algebra – Khan Academy",provider:"Khan Academy",platform:"Khan Academy",pc:"plat-khan",level:"Beginner",duration:"Self-paced",cost:"free",price:"FREE",note:"Always free",rating:4.8,reviews:"Millions",desc:"Vectors, matrices, transformations, eigenvalues.",topics:["Vectors","Matrices","Eigenvalues","Transformations"],link:"https://www.khanacademy.org/math/linear-algebra"},
+  {domain:"∑ Mathematics",title:"Calculus 1 & 2 – MIT OCW",provider:"MIT OCW",platform:"MIT OCW",pc:"plat-mit",level:"Intermediate",duration:"Self-paced",cost:"free",price:"FREE",note:"No cert",rating:4.9,reviews:"MIT quality",desc:"Single variable calculus with problem sets. MIT 18.01.",topics:["Limits","Derivatives","Integrals","Series"],link:"https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/"},
+  {domain:"∑ Mathematics",title:"Discrete Mathematics for CS",provider:"UC San Diego",platform:"Coursera",pc:"plat-coursera",level:"Intermediate",duration:"5 months",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.6,reviews:"30K+",desc:"Logic, sets, combinatorics, graph theory.",topics:["Logic","Sets","Graphs","Combinatorics"],link:"https://www.coursera.org/specializations/discrete-mathematics"},
+  {domain:"∑ Mathematics",title:"Essence of Linear Algebra – 3B1B",provider:"3Blue1Brown",platform:"YouTube",pc:"plat-youtube",level:"Beginner",duration:"~3.5 hrs",cost:"free",price:"FREE",note:"YouTube",rating:5.0,reviews:"5M+",desc:"Visual intuition behind linear algebra. Best series.",topics:["Vectors","Matrices","Determinants","Eigenvectors"],link:"https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab"},
+  {domain:"∑ Mathematics",title:"Probability & Statistics – MIT OCW",provider:"MIT OCW",platform:"MIT OCW",pc:"plat-mit",level:"Intermediate",duration:"Self-paced",cost:"free",price:"FREE",note:"No cert",rating:4.8,reviews:"MIT quality",desc:"Distributions, expectation, CLT, Bayesian inference.",topics:["Probability","Distributions","Bayesian","CLT"],link:"https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/"},
+  // LANGUAGES
+  {domain:"🗣️ Languages",title:"Learning How to Learn",provider:"UC San Diego",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"4 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.8,reviews:"400K+",desc:"Most enrolled Coursera course. Memory, procrastination, focus.",topics:["Memory","Focus","Procrastination","Chunking"],link:"https://www.coursera.org/learn/learning-how-to-learn"},
+  {domain:"🗣️ Languages",title:"English for Career Development",provider:"UPenn",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"5 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.8,reviews:"200K+",desc:"Resumes, interviews, professional English communication.",topics:["Resume","Interviews","Email","Networking"],link:"https://www.coursera.org/learn/careerdevelopment"},
+  {domain:"🗣️ Languages",title:"Duolingo English Learning",provider:"Duolingo",platform:"Duolingo",pc:"plat-other",level:"All Levels",duration:"Self-paced",cost:"freemium",price:"Free",note:"Test fee $65",rating:4.6,reviews:"Millions",desc:"Adaptive English: reading, writing, listening, speaking.",topics:["Reading","Writing","Listening","Speaking"],link:"https://www.duolingo.com/"},
+  {domain:"🗣️ Languages",title:"Academic Writing in English",provider:"Lund University",platform:"Coursera",pc:"plat-coursera",level:"Intermediate",duration:"5 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.5,reviews:"20K+",desc:"Academic essays, research papers, thesis writing.",topics:["Essay Structure","Argumentation","Citations"],link:"https://www.coursera.org/learn/academic-writing"},
+  {domain:"🗣️ Languages",title:"Introduction to Philosophy",provider:"U. Edinburgh",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"5 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"55K+",desc:"Mind, free will, moral truth. Classic philosophical questions.",topics:["Epistemology","Ethics","Mind","Logic"],link:"https://www.coursera.org/learn/philosophy"},
+  {domain:"🗣️ Languages",title:"Science of Well-Being – Yale",provider:"Yale University",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"10 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.9,reviews:"4M+",desc:"Evidence-based happiness. Yale's most popular course.",topics:["Happiness","Positive Psychology","Habits"],link:"https://www.coursera.org/learn/the-science-of-well-being"},
+  // HEALTH
+  {domain:"🏥 Health",title:"Science of Exercise",provider:"U. Colorado",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"4 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"40K+",desc:"Physiology of exercise, metabolism, fitness, nutrition.",topics:["Physiology","Metabolism","Training","Nutrition"],link:"https://www.coursera.org/learn/science-exercise"},
+  {domain:"🏥 Health",title:"COVID-19 Contact Tracing – JHU",provider:"Johns Hopkins",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"6 hrs",cost:"free",price:"FREE",note:"Free cert",rating:4.7,reviews:"400K+",desc:"Epidemiology, contact tracing, public health.",topics:["Epidemiology","Public Health","Tracing"],link:"https://www.coursera.org/learn/covid-19-contact-tracing"},
+  {domain:"🏥 Health",title:"Nutrition and Health",provider:"Wageningen U.",platform:"edX",pc:"plat-edx",level:"Beginner",duration:"6 weeks",cost:"freemium",price:"Free audit",note:"$149 cert",rating:4.6,reviews:"30K+",desc:"Diet, chronic disease, nutrient metabolism.",topics:["Diet","Chronic Disease","Metabolism"],link:"https://www.edx.org/learn/nutrition/wageningen-university-research-nutrition-and-health"},
+  {domain:"🏥 Health",title:"Anatomy: Musculoskeletal Systems",provider:"Duke University",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"4 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"20K+",desc:"Bones, muscles, skin. Medical-grade anatomy.",topics:["Bones","Muscles","Skin","Anatomy"],link:"https://www.coursera.org/learn/duke-musculoskeletal-and-integumentary-systems"},
+  {domain:"🏥 Health",title:"Brain & Cognitive Sciences – MIT",provider:"MIT OCW",platform:"MIT OCW",pc:"plat-mit",level:"Intermediate",duration:"Self-paced",cost:"free",price:"FREE",note:"No cert",rating:4.7,reviews:"MIT quality",desc:"Neural systems, perception, cognition, neuroscience.",topics:["Neuroscience","Cognition","Perception","Memory"],link:"https://ocw.mit.edu/courses/9-00sc-introduction-to-psychology-fall-2011/"},
+  // ENGINEERING
+  {domain:"⚙️ Engineering",title:"Intro to Electrical Engineering – UCB",provider:"UC Berkeley",platform:"edX",pc:"plat-edx",level:"Beginner",duration:"16 weeks",cost:"freemium",price:"Free audit",note:"$99 cert",rating:4.7,reviews:"50K+",desc:"Circuits, signals, systems, microelectronics.",topics:["Circuits","Signals","Systems","Transistors"],link:"https://www.edx.org/learn/electrical-engineering"},
+  {domain:"⚙️ Engineering",title:"MIT Thermodynamics",provider:"MIT OCW",platform:"MIT OCW",pc:"plat-mit",level:"Intermediate",duration:"Self-paced",cost:"free",price:"FREE",note:"No cert",rating:4.8,reviews:"MIT quality",desc:"Laws of thermodynamics, heat engines, entropy.",topics:["Thermodynamics","Heat Transfer","Entropy","Engines"],link:"https://ocw.mit.edu/courses/2-005-thermal-fluids-engineering-i-fall-2010/"},
+  {domain:"⚙️ Engineering",title:"Introduction to Robotics",provider:"Stanford University",platform:"Coursera",pc:"plat-coursera",level:"Intermediate",duration:"9 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.7,reviews:"30K+",desc:"Robot mechanics, kinematics, control, motion planning.",topics:["Kinematics","Control","Path Planning","Vision"],link:"https://www.coursera.org/learn/modernrobotics"},
+  {domain:"⚙️ Engineering",title:"Physics – Khan Academy",provider:"Khan Academy",platform:"Khan Academy",pc:"plat-khan",level:"Beginner",duration:"Self-paced",cost:"free",price:"FREE",note:"Always free",rating:4.8,reviews:"Millions",desc:"Mechanics, thermodynamics, EM, waves, modern physics.",topics:["Mechanics","Thermodynamics","Electricity","Waves"],link:"https://www.khanacademy.org/science/physics"},
+  {domain:"⚙️ Engineering",title:"Intro to Aerospace Engineering – MIT",provider:"MIT OCW",platform:"MIT OCW",pc:"plat-mit",level:"Intermediate",duration:"Self-paced",cost:"free",price:"FREE",note:"No cert",rating:4.8,reviews:"MIT quality",desc:"Lift, drag, propulsion, orbital mechanics.",topics:["Aerodynamics","Propulsion","Orbital Mechanics"],link:"https://ocw.mit.edu/courses/16-00-introduction-to-aerospace-and-design-spring-2003/"},
+  {domain:"⚙️ Engineering",title:"Science of Solar System – Caltech",provider:"Caltech",platform:"Coursera",pc:"plat-coursera",level:"Beginner",duration:"10 weeks",cost:"freemium",price:"Free audit",note:"₹3,999/mo cert",rating:4.8,reviews:"50K+",desc:"Planetary science, exoplanets, astrobiology.",topics:["Planets","Geology","Moons","Astrobiology"],link:"https://www.coursera.org/learn/solar-system"},
+  {domain:"⚙️ Engineering",title:"Biology – MIT 7.012",provider:"MIT OCW",platform:"MIT OCW",pc:"plat-mit",level:"Beginner",duration:"Self-paced",cost:"free",price:"FREE",note:"No cert",rating:4.9,reviews:"MIT quality",desc:"Biochemistry, genetics, molecular biology, cell biology.",topics:["DNA","Genetics","Cell Biology","Biochemistry"],link:"https://ocw.mit.edu/courses/7-012-introduction-to-biology-fall-2004/"},
+  {domain:"⚙️ Engineering",title:"Structural Engineering – NPTEL",provider:"IIT Kharagpur",platform:"NPTEL",pc:"plat-nptel",level:"Intermediate",duration:"12 weeks",cost:"freemium",price:"Free",note:"₹1,000 cert",rating:4.5,reviews:"20K+",desc:"Analysis of structures, trusses, beams, columns.",topics:["Trusses","Beams","Columns","Analysis"],link:"https://nptel.ac.in/courses/105/105/105105108/"},
+  {domain:"⚙️ Engineering",title:"Introduction to Environmental Science",provider:"Dartmouth",platform:"edX",pc:"plat-edx",level:"Beginner",duration:"7 weeks",cost:"freemium",price:"Free audit",note:"$149 cert",rating:4.6,reviews:"20K+",desc:"Ecosystems, climate change, sustainability.",topics:["Ecosystems","Climate","Sustainability","Policy"],link:"https://www.edx.org/learn/environmental-science/dartmouth-college-introduction-to-environmental-science"}
+];
+
+// ═══════════════════════════════════════════════════════════
+// STEP 6: COURSES
+// ═══════════════════════════════════════════════════════════
+function levelBadgeClass(level) {
+  if (level === 'Beginner') return 'lb-beg';
+  if (level === 'Intermediate') return 'lb-int';
+  if (level === 'Advanced') return 'lb-adv';
+  return 'lb-all';
+}
+
+function costHtml(cost) {
+  if (cost === 'free') return `<span class="c-cost c-free">🟢 FREE</span>`;
+  if (cost === 'paid') return `<span class="c-cost c-paid">🔴 PAID</span>`;
+  return `<span class="c-cost c-freemium">🟡 FREEMIUM</span>`;
+}
+
+function priceColor(cost) {
+  if (cost === 'free') return 'color:#6ee7b7';
+  if (cost === 'paid') return 'color:#fdba74';
+  return 'color:var(--gold)';
+}
+
+function starsHtml(r) {
+  const f = Math.floor(r);
+  return '★'.repeat(f) + (r%1>=0.5?'½':'') + '☆'.repeat(5-f-(r%1>=0.5?1:0));
+}
+
+function courseCard(c, delay=0) {
+  return `<div class="c-card" style="animation-delay:${delay*0.04}s">
+    <div class="c-top">
+      <div class="c-plat-row">
+        <span class="c-plat ${c.pc}">${c.platform}</span>
+        ${costHtml(c.cost)}
+      </div>
+      <div class="c-title">${c.title}</div>
+      <div class="c-prov">by ${c.provider}</div>
+    </div>
+    <div class="c-body">
+      <div class="c-rating-row"><span class="c-stars">${starsHtml(c.rating)}</span><span class="c-rn">${c.rating} · ${c.reviews}</span></div>
+      <div class="c-desc">${c.desc}</div>
+      <div class="c-chips">
+        <span class="c-chip cc-lvl">📊 ${c.level}</span>
+        <span class="c-chip cc-dur">⏱ ${c.duration}</span>
+      </div>
+      <div class="c-price" style="${priceColor(c.cost)}">${c.price}</div>
+      <div class="c-price-sub">${c.note}</div>
+    </div>
+    <div class="c-foot">
+      <div class="c-topics">${c.topics.map(t=>`<span class="c-topic">${t}</span>`).join('')}</div>
+      <a href="${c.link}" target="_blank" rel="noopener" class="c-btn">View Course →</a>
+    </div>
+  </div>`;
+}
+
+function buildRecommended() {
+  if (!STATE.analysis) return;
+  const { level, foundSkills } = STATE.analysis;
+  const sl = foundSkills.map(s => s.toLowerCase());
+  const prefLevel = level === 'High' ? 'Advanced' : level === 'Low' ? 'Beginner' : 'Intermediate';
+  const recs = COURSES.map(c => {
+    let sc = 0;
+    if (c.level === prefLevel) sc += 4;
+    if (c.level === 'Beginner' && level === 'Low') sc += 3;
+    const tl = c.topics.map(t=>t.toLowerCase()).join(' ');
+    sl.forEach(s => { if (tl.includes(s)||s.includes(tl.split(' ')[0])) sc += 2; });
+    const dom = (STATE.targetDomain || '').toLowerCase();
+    if (dom && c.domain.toLowerCase().includes(dom.split(' ')[0])) sc += 3;
+    if (c.cost === 'free') sc++;
+    return { ...c, sc };
+  }).sort((a,b) => b.sc - a.sc).slice(0, 9);
+
+  const lb = document.getElementById('recLevelBadge');
+  lb.textContent = prefLevel + ' Recommended';
+  lb.className = 'level-badge ' + levelBadgeClass(prefLevel);
+
+  document.getElementById('aiRecommendedGrid').innerHTML = recs.map((c,i) => courseCard(c, i)).join('');
+}
+
+function buildDomainScroller() {
+  const domains = [...new Set(COURSES.map(c=>c.domain))];
+  const sc = document.getElementById('domainScroller');
+  sc.innerHTML = `<button class="d-tab on" onclick="setActiveDomain('',this)">All (${COURSES.length})</button>` +
+    domains.map(d => {
+      const ct = COURSES.filter(c=>c.domain===d).length;
+      return `<button class="d-tab" onclick="setActiveDomain('${d}',this)">${d} (${ct})</button>`;
+    }).join('');
+}
+
+function setActiveDomain(d, el) {
+  STATE.activeDomain = d;
+  document.querySelectorAll('.d-tab').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  renderBrowse();
+}
+
+function renderBrowse() {
+  const q = (document.getElementById('browseSearch')||{value:''}).value.toLowerCase();
+  const lv = document.getElementById('browseLevelF').value;
+  const cs = document.getElementById('browseCostF').value;
+  const filtered = COURSES.filter(c => {
+    const mq = !q || [c.title,c.provider,c.platform,...c.topics,c.desc,c.domain].join(' ').toLowerCase().includes(q);
+    return mq && (!lv||c.level===lv) && (!cs||c.cost===cs) && (!STATE.activeDomain||c.domain===STATE.activeDomain);
+  });
+  document.getElementById('browseCount').textContent = `${filtered.length} of ${COURSES.length}`;
+  document.getElementById('browseGrid').innerHTML = filtered.length
+    ? filtered.map((c,i)=>courseCard(c,i)).join('')
+    : `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)">🔎 No courses match. Try different filters.</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// STEP 7: FEEDBACK
+// ═══════════════════════════════════════════════════════════
+function setRating(v) {
+  STATE.rating = v;
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('lit', parseInt(b.dataset.v) <= v);
+    b.textContent = parseInt(b.dataset.v) <= v ? '★' : '☆';
+  });
+}
+
+function selectPill(el, group) {
+  document.querySelectorAll(`#${group}Pills .rpill`).forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function submitFeedback() {
+  document.getElementById('feedbackForm').style.display = 'none';
+  document.getElementById('feedbackDone').style.display = 'block';
+  document.getElementById('feedbackDone').scrollIntoView({behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+updateProgress(1);
+</script>
+</body>
+</html>
